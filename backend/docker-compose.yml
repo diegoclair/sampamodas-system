@@ -7,7 +7,7 @@ services:
     build: .
     command: ./.docker/entrypoint.sh
     ports:
-      - 3000:3000
+      - 5000:5000
     environment:
       WAIT_HOSTS: db:3306
       WAIT_HOSTS_TIMEOUT: 300

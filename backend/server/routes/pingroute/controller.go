@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
 var (
@@ -24,8 +25,8 @@ func NewController() *Controller {
 }
 
 // handlePing - handle a Ping request
-func (s *Controller) handlePing(c *gin.Context) {
-	c.JSON(200, gin.H{
+func (s *Controller) handlePing(c echo.Context) error {
+	return c.JSON(200, gin.H{
 		"message": "pong",
 	})
 }

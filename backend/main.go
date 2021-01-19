@@ -24,10 +24,10 @@ func main() {
 	port := os.Getenv("PORT")
 
 	if port == "" {
-		port = "3000"
+		port = "5000"
 	}
 
-	if err := server.Run(":" + port); err != nil {
+	if err := server.Start(":" + port); err != nil {
 		panic(err)
 	}
 }

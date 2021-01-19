@@ -1,17 +1,17 @@
 package leadroute
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
 // LeadRouter holds the lead handlers
 type LeadRouter struct {
 	ctrl   *Controller
-	router *gin.Engine
+	router *echo.Echo
 }
 
 // NewRouter returns a new LeadRouter instance
-func NewRouter(ctrl *Controller, router *gin.Engine) *LeadRouter {
+func NewRouter(ctrl *Controller, router *echo.Echo) *LeadRouter {
 	return &LeadRouter{
 		ctrl:   ctrl,
 		router: router,
