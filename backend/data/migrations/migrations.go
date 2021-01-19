@@ -208,5 +208,13 @@ var (
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
 		},
+		{
+			Version:     10,
+			Description: "Inserting data into tab_company",
+			Script: `
+				INSERT INTO tab_company (document_number, legal_name, commercial_name)
+				VALUES ('0123456789', 'Sampa Modas Oficial', 'Sampa Modas Oficial');
+			`,
+		},
 	}
 )
