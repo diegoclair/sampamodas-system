@@ -6,6 +6,7 @@ import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
 type companyRepo struct {
@@ -19,31 +20,34 @@ func newCompanyRepo(db *sql.DB) *companyRepo {
 	}
 }
 
-func (s *companyRepo) GetCompanyIDByUUID(uuid string) (int64, resterrors.RestErr) {
+func (s *companyRepo) CreateCompany(company entity.Company) resterrors.RestErr {
 
 	query := `
-		SELECT 	tcp.id
-
-		FROM 	tab_company_partners 	tcp
-		WHERE  	tcp.uuid = ?`
+		INSERT INTO tab_company (
+			document_number,
+			legal_name,
+			commercial_name
+		) 
+		VALUES	
+			(?, ?, ?);
+		`
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("GetCompanyIDByUUID", err)
-		return 0, resterrors.NewInternalServerError("Database error")
+		logger.Error("companyRepo.CreateCompany", err)
+		return resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
-	result := stmt.QueryRow(uuid)
-	var companyID int64
-	err = result.Scan(
-		&companyID,
+	_, err = stmt.Exec(
+		company.DocumentNumber,
+		company.LegalName,
+		company.CommercialName,
 	)
-
 	if err != nil {
-		logger.Error("GetCompanyIDByUUID", err)
-		return 0, mysqlutils.HandleMySQLError(err)
+		logger.Error("companyRepo.CreateCompany", err)
+		return mysqlutils.HandleMySQLError(err)
 	}
 
-	return companyID, nil
+	return nil
 }

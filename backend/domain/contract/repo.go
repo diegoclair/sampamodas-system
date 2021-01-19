@@ -13,7 +13,7 @@ type RepoManager interface {
 
 // CompanyRepo defines the data set for qrcode
 type CompanyRepo interface {
-	GetCompanyIDByUUID(uuid string) (int64, resterrors.RestErr)
+	CreateCompany(company entity.Company) resterrors.RestErr
 }
 
 // LeadRepo defines the data set for lead

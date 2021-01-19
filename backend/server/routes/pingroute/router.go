@@ -20,5 +20,5 @@ func NewRouter(ctrl *Controller, router *echo.Echo) *PingRouter {
 
 //RegisterRoutes is a routers map of ping requests
 func (r *PingRouter) RegisterRoutes() {
-	r.router.GET("/ping", r.ctrl.handlePing)
+	r.router.GET("/ping/", r.ctrl.handlePing)
 }
