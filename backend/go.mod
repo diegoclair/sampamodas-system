@@ -3,19 +3,25 @@ module github.com/diegoclair/sampamodas-system/backend
 go 1.15
 
 require (
+	github.com/DATA-DOG/go-sqlmock v1.5.0 // indirect
 	github.com/GuiaBolso/darwin v0.0.0-20191218124601-fd6d2aa3d244
 	github.com/IQ-tech/go-mapper v1.0.5
-	github.com/Microsoft/go-winio v0.4.16 // indirect
-	github.com/containerd/containerd v1.4.3 // indirect
+	github.com/cznic/ql v1.2.0 // indirect
 	github.com/diegoclair/go_utils-lib v1.1.3
-	github.com/docker/docker v20.10.2+incompatible // indirect
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/golang-migrate/migrate/v4 v4.14.1
-	github.com/gorilla/mux v1.8.0 // indirect
-	github.com/moby/term v0.0.0-20201216013528-df9cb8a40635 // indirect
+	github.com/golang/protobuf v1.4.3 // indirect
+	github.com/golang/snappy v0.0.1 // indirect
+	github.com/google/go-cmp v0.5.1 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cast v1.3.1
 	github.com/spf13/viper v1.7.1
-	gotest.tools/v3 v3.0.3 // indirect
+	golang.org/x/lint v0.0.0-20200302205851-738671d3881b // indirect
+	golang.org/x/sys v0.0.0-20201029080932-201ba4db2418 // indirect
+	golang.org/x/text v0.3.3 // indirect
+	golang.org/x/tools v0.0.0-20200818005847-188abfa75333 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
+	google.golang.org/protobuf v1.25.0 // indirect
+	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 )
