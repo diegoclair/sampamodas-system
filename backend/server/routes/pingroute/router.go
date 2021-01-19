@@ -1,17 +1,17 @@
 package pingroute
 
 import (
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
 )
 
 // PingRouter holds the ping handlers
 type PingRouter struct {
 	ctrl   *Controller
-	router *gin.Engine
+	router *echo.Echo
 }
 
 // NewRouter returns a new PingRouter instance
-func NewRouter(ctrl *Controller, router *gin.Engine) *PingRouter {
+func NewRouter(ctrl *Controller, router *echo.Echo) *PingRouter {
 	return &PingRouter{
 		ctrl:   ctrl,
 		router: router,

@@ -13,6 +13,8 @@ import (
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 	"github.com/diegoclair/sampamodas-system/backend/server/viewmodel"
 	"github.com/gin-gonic/gin"
+
+	"github.com/labstack/echo/v4"
 )
 
 var (
@@ -37,49 +39,44 @@ func NewController(leadService contract.LeadService, mapper mapper.Mapper) *Cont
 	return instance
 }
 
-func (s *Controller) handleGetLeadAddress(c *gin.Context) {
+func (s *Controller) handleGetLeadAddress(c echo.Context) error {
 
 	leadID, parseErr := strconv.Atoi(c.Param("lead_id"))
 	if parseErr != nil {
 		err := resterrors.NewBadRequestError("lead_id parameter is invalid")
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
 	leadAddresses, err := s.leadService.GetLeadAddress(int64(leadID))
 	if err != nil {
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
 	response := []viewmodel.Address{}
 	mapErr := s.mapper.From(leadAddresses).To(&response)
 	if mapErr != nil {
 		err = resterrors.NewInternalServerError("Error to do the mapper: " + fmt.Sprint(mapErr))
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
-	c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }
 
-func (s *Controller) handleCreateNewSale(c *gin.Context) {
+func (s *Controller) handleCreateNewSale(c echo.Context) error {
 
 	leadID, parseErr := strconv.Atoi(c.Param("lead_id"))
 	if parseErr != nil {
 		err := resterrors.NewBadRequestError("lead_id parameter is invalid")
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
 	input := viewmodel.Sale{}
 
-	err := c.ShouldBindJSON(&input)
+	err := c.Bind(&input)
 	if err != nil {
 		logger.Error("handleCreateNewSale", err)
 		restErr := resterrors.NewBadRequestError("Invalid json body")
-		c.JSON(restErr.StatusCode(), restErr)
-		return
+		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
 	sale := entity.Sale{}
@@ -87,43 +84,38 @@ func (s *Controller) handleCreateNewSale(c *gin.Context) {
 	mapErr := s.mapper.From(input).To(&sale)
 	if mapErr != nil {
 		restErr := resterrors.NewInternalServerError("Error to do the mapper: " + fmt.Sprint(mapErr))
-		c.JSON(restErr.StatusCode(), restErr)
-		return
+		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
 	sale.LeadID = int64(leadID)
 
-	saleNumber, createErr := s.leadService.CreateSale(sale)
-	if createErr != nil {
-		c.JSON(createErr.StatusCode(), createErr)
-		return
+	saleNumber, restErr := s.leadService.CreateSale(sale)
+	if restErr != nil {
+		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	c.JSON(http.StatusOK, gin.H{"saleNumber": saleNumber})
+	return c.JSON(http.StatusOK, gin.H{"saleNumber": saleNumber})
 }
 
-func (s *Controller) handleGetSaleSummary(c *gin.Context) {
+func (s *Controller) handleGetSaleSummary(c echo.Context) error {
 
 	leadID, parseErr := strconv.Atoi(c.Param("lead_id"))
 	if parseErr != nil {
 		err := resterrors.NewBadRequestError("lead_id parameter is invalid")
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
 	saleSummary, err := s.leadService.GetLeadSalesSummary(int64(leadID))
 	if err != nil {
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
 	response := []viewmodel.SaleSummary{}
 	mapErr := s.mapper.From(saleSummary).To(&response)
 	if mapErr != nil {
 		err = resterrors.NewInternalServerError("Error to do the mapper: " + fmt.Sprint(mapErr))
-		c.JSON(err.StatusCode(), err)
-		return
+		return c.JSON(err.StatusCode(), err)
 	}
 
-	c.JSON(http.StatusOK, response)
+	return c.JSON(http.StatusOK, response)
 }

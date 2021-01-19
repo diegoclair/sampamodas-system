@@ -5,8 +5,8 @@ import (
 	"github.com/diegoclair/sampamodas-system/backend/server/routes/leadroute"
 	"github.com/diegoclair/sampamodas-system/backend/server/routes/pingroute"
 	"github.com/diegoclair/sampamodas-system/backend/service"
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type controller struct {
@@ -15,14 +15,14 @@ type controller struct {
 }
 
 //InitServer to initialize the server
-func InitServer(svc *service.Service) *gin.Engine {
+func InitServer(svc *service.Service) *echo.Echo {
 	mapper := mapper.New()
 	svm := service.NewServiceManager()
-	srv := gin.Default()
+	srv := echo.New()
 
 	leadService := svm.LeadService(svc)
 
-	srv.Use(cors.Default())
+	srv.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
 	return setupRoutes(srv, &controller{
 		pingController: pingroute.NewController(),
@@ -31,7 +31,7 @@ func InitServer(svc *service.Service) *gin.Engine {
 }
 
 //setupRoutes - Register and instantiate the routes
-func setupRoutes(srv *gin.Engine, s *controller) *gin.Engine {
+func setupRoutes(srv *echo.Echo, s *controller) *echo.Echo {
 
 	pingroute.NewRouter(s.pingController, srv).RegisterRoutes()
 	leadroute.NewRouter(s.leadController, srv).RegisterRoutes()

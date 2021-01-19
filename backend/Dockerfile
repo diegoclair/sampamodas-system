@@ -16,7 +16,7 @@ ENV WAIT_VERSION 2.7.2
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
 RUN chmod +x /wait
 
-EXPOSE 3000
+EXPOSE 5000
 
 #This is used to run the application with live reload
 RUN go get github.com/githubnemo/CompileDaemon
