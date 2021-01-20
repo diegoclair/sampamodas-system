@@ -21,4 +21,6 @@ func NewRouter(ctrl *Controller, router *echo.Echo) *CompanyRouter {
 //RegisterRoutes is a routers map of company requests
 func (r *CompanyRouter) RegisterRoutes() {
 	r.router.POST("/company/", r.ctrl.handleCreateCompany)
+	r.router.GET("/companies/", r.ctrl.handleGetCompanies)
+	r.router.GET("/company/:id/", r.ctrl.handleGetCompanyByID)
 }

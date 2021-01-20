@@ -17,21 +17,18 @@ func newBusinessService(svc *Service) contract.BusinessService {
 	}
 }
 
-func (s *businessService) GetLeadAddress(leadID int64) (address []entity.Address, err resterrors.RestErr) {
-	return s.svc.db.Lead().GetLeadAddress(leadID)
+func (s *businessService) GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr) {
+	return s.svc.db.Business().GetBusinesses()
 }
 
-func (s *businessService) GetLeadSalesSummary(leadID int64) (summary []entity.SaleSummary, err resterrors.RestErr) {
+func (s *businessService) GetBusinessByID(businessID int64) (business entity.Business, restErr resterrors.RestErr) {
+	return s.svc.db.Business().GetBusinessByID(businessID)
+}
 
-	return s.svc.db.Lead().GetSaleSummary(leadID)
+func (s *businessService) GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr) {
+	return s.svc.db.Business().GetBusinessesByCompanyID(companyID)
 }
 
 func (s *businessService) CreateBusiness(business entity.Business) resterrors.RestErr {
-
-	err := s.svc.db.Business().CreateBusiness(business)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return s.svc.db.Business().CreateBusiness(business)
 }

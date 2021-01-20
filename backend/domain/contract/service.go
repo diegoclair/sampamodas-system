@@ -12,11 +12,16 @@ type PingService interface {
 // BusinessService holds a ping service operations
 type BusinessService interface {
 	CreateBusiness(company entity.Business) resterrors.RestErr
+	GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr)
+	GetBusinessByID(businessID int64) (businesses entity.Business, restErr resterrors.RestErr)
+	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr)
 }
 
 // CompanyService holds a ping service operations
 type CompanyService interface {
 	CreateCompany(company entity.Company) resterrors.RestErr
+	GetCompanies() (companies []entity.Company, restErr resterrors.RestErr)
+	GetCompanyByID(companyID int64) (company entity.Company, restErr resterrors.RestErr)
 }
 
 // LeadService holds a lead service operations

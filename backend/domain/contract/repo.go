@@ -15,11 +15,16 @@ type RepoManager interface {
 // BusinessRepo defines the data set for qrcode
 type BusinessRepo interface {
 	CreateBusiness(company entity.Business) resterrors.RestErr
+	GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr)
+	GetBusinessByID(businessID int64) (businesses entity.Business, restErr resterrors.RestErr)
+	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr)
 }
 
 // CompanyRepo defines the data set for qrcode
 type CompanyRepo interface {
 	CreateCompany(company entity.Company) resterrors.RestErr
+	GetCompanies() (companies []entity.Company, restErr resterrors.RestErr)
+	GetCompanyByID(companyID int64) (company entity.Company, restErr resterrors.RestErr)
 }
 
 // LeadRepo defines the data set for lead
