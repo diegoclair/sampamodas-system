@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
@@ -35,7 +34,6 @@ func (s *productRepo) CreateProduct(product entity.Product) (productID int64, re
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.CreateProduct", err)
 		return productID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -49,13 +47,11 @@ func (s *productRepo) CreateProduct(product entity.Product) (productID int64, re
 		product.BusinessID,
 	)
 	if err != nil {
-		logger.Error("productRepo.CreateProduct", err)
 		return productID, mysqlutils.HandleMySQLError(err)
 	}
 
 	productID, err = result.LastInsertId()
 	if err != nil {
-		logger.Error("productRepo.CreateProduct", err)
 		return productID, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -87,14 +83,12 @@ func (s *productRepo) GetProducts() (products []entity.Product, restErr resterro
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.GetProducts: ", err)
 		return products, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {
-		logger.Error("productRepo.GetProducts: ", err)
 		return products, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -112,7 +106,6 @@ func (s *productRepo) GetProducts() (products []entity.Product, restErr resterro
 			&product.Brand.Name,
 		)
 		if err != nil {
-			logger.Error("productRepo.GetProducts: ", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		products = append(products, product)
@@ -148,14 +141,12 @@ func (s *productRepo) GetProductByID(productID int64) (product entity.Product, r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.GetProduct: ", err)
 		return product, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(productID)
 	if err != nil {
-		logger.Error("productRepo.GetProduct: ", err)
 		return product, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -171,7 +162,6 @@ func (s *productRepo) GetProductByID(productID int64) (product entity.Product, r
 		&product.Brand.Name,
 	)
 	if err != nil {
-		logger.Error("productRepo.GetProduct: ", err)
 		return product, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -199,14 +189,12 @@ func (s *productRepo) GetStockProductByID(productID int64) (productsStock []enti
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.GetStockProductByID: ", err)
 		return productsStock, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(productID)
 	if err != nil {
-		logger.Error("companyRepo.GetStockProductByID: ", err)
 		return productsStock, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -220,7 +208,6 @@ func (s *productRepo) GetStockProductByID(productID int64) (productsStock []enti
 			&productStock.Quantity,
 		)
 		if err != nil {
-			logger.Error("companyRepo.GetStockProductByID: ", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		productsStock = append(productsStock, productStock)
@@ -244,7 +231,6 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.CreateProductStock", err)
 		return resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -256,7 +242,6 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 		productStock.Quantity,
 	)
 	if err != nil {
-		logger.Error("productRepo.CreateProductStock", err)
 		return mysqlutils.HandleMySQLError(err)
 	}
 
@@ -275,7 +260,6 @@ func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr rest
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.CreateBrand", err)
 		return brandID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -284,13 +268,11 @@ func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr rest
 		brandName,
 	)
 	if err != nil {
-		logger.Error("productRepo.CreateBrand", err)
 		return brandID, mysqlutils.HandleMySQLError(err)
 	}
 
 	brandID, err = result.LastInsertId()
 	if err != nil {
-		logger.Error("productRepo.CreateBrand.LastInsertId", err)
 		return brandID, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -310,14 +292,12 @@ func (s *productRepo) GetBrandByName(brandName string) (brandID int64, restErr r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.GetBrandByName: ", err)
 		return brandID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(brandName)
 	if err != nil {
-		logger.Error("productRepo.GetBrandByName: ", err)
 		return brandID, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -325,7 +305,6 @@ func (s *productRepo) GetBrandByName(brandName string) (brandID int64, restErr r
 		&brandID,
 	)
 	if err != nil {
-		logger.Error("productRepo.GetBrandByName: ", err)
 		return brandID, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -344,7 +323,6 @@ func (s *productRepo) CreateColor(colorName string) (colorID int64, restErr rest
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.CreateColor", err)
 		return colorID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -353,13 +331,11 @@ func (s *productRepo) CreateColor(colorName string) (colorID int64, restErr rest
 		colorName,
 	)
 	if err != nil {
-		logger.Error("productRepo.CreateColor", err)
 		return colorID, mysqlutils.HandleMySQLError(err)
 	}
 
 	colorID, err = result.LastInsertId()
 	if err != nil {
-		logger.Error("productRepo.CreateColor.LastInsertId", err)
 		return colorID, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -379,14 +355,12 @@ func (s *productRepo) GetColorByName(colorName string) (colorID int64, restErr r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.GetColorByName: ", err)
 		return colorID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(colorName)
 	if err != nil {
-		logger.Error("productRepo.GetColorByName: ", err)
 		return colorID, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -394,7 +368,6 @@ func (s *productRepo) GetColorByName(colorName string) (colorID int64, restErr r
 		&colorID,
 	)
 	if err != nil {
-		logger.Error("productRepo.GetColorByName: ", err)
 		return colorID, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -413,7 +386,6 @@ func (s *productRepo) CreateGender(genderName string) (genderID int64, restErr r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.CreateGender", err)
 		return genderID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -422,13 +394,11 @@ func (s *productRepo) CreateGender(genderName string) (genderID int64, restErr r
 		genderName,
 	)
 	if err != nil {
-		logger.Error("productRepo.CreateGender", err)
 		return genderID, mysqlutils.HandleMySQLError(err)
 	}
 
 	genderID, err = result.LastInsertId()
 	if err != nil {
-		logger.Error("productRepo.CreateGender.LastInsertId", err)
 		return genderID, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -448,14 +418,12 @@ func (s *productRepo) GetGenderByName(genderName string) (genderID int64, restEr
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("productRepo.GetGenderByName: ", err)
 		return genderID, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(genderName)
 	if err != nil {
-		logger.Error("productRepo.GetGenderByName: ", err)
 		return genderID, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -463,7 +431,6 @@ func (s *productRepo) GetGenderByName(genderName string) (genderID int64, restEr
 		&genderID,
 	)
 	if err != nil {
-		logger.Error("productRepo.GetGenderByName: ", err)
 		return genderID, mysqlutils.HandleMySQLError(err)
 	}
 

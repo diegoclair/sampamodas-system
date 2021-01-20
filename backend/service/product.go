@@ -66,6 +66,7 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 
 	product.ID, err = tx.Product().CreateProduct(product)
 	if err != nil {
+		logger.Error("productService.CreateProduct.CreateProduct: ", err)
 		return err
 	}
 
@@ -80,6 +81,7 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 
 		err = tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
 		if err != nil {
+			logger.Error("productService.CreateProduct.CreateProductStock: ", err)
 			return err
 		}
 	}
@@ -102,6 +104,7 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 	if err != nil {
 		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
 		if len(noRowsIdx) > 0 {
+			logger.Error("getColorIDByName.GetBrandByName: ", err)
 			return brandID, err
 		}
 	}
@@ -110,25 +113,13 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 		return brandID, nil
 	}
 
-	return s.svc.db.Product().CreateBrand(brandName)
-}
-
-func (s *productService) getGenderIDByName(genderName string) (genderID int64, err resterrors.RestErr) {
-
-	s.firstLetterUppercase(&genderName)
-	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
+	brandID, err = s.svc.db.Product().CreateBrand(brandName)
 	if err != nil {
-		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
-		if len(noRowsIdx) > 0 {
-			return genderID, err
-		}
+		logger.Error("getColorIDByName.CreateBrand: ", err)
+		return brandID, err
 	}
 
-	if genderID > 0 {
-		return genderID, nil
-	}
-
-	return s.svc.db.Product().CreateGender(genderName)
+	return brandID, nil
 }
 
 func (s *productService) getColorIDByName(colorName string) (colorID int64, err resterrors.RestErr) {
@@ -138,6 +129,7 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 	if err != nil {
 		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
 		if len(noRowsIdx) > 0 {
+			logger.Error("getColorIDByName.GetColorByName: ", err)
 			return colorID, err
 		}
 	}
@@ -146,7 +138,38 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 		return colorID, nil
 	}
 
-	return s.svc.db.Product().CreateColor(colorName)
+	colorID, err = s.svc.db.Product().CreateColor(colorName)
+	if err != nil {
+		logger.Error("getColorIDByName.CreateColor: ", err)
+		return colorID, err
+	}
+
+	return colorID, nil
+}
+
+func (s *productService) getGenderIDByName(genderName string) (genderID int64, err resterrors.RestErr) {
+
+	s.firstLetterUppercase(&genderName)
+	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
+	if err != nil {
+		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
+		if len(noRowsIdx) > 0 {
+			logger.Error("getColorIDByName.GetGenderByName: ", err)
+			return genderID, err
+		}
+	}
+
+	if genderID > 0 {
+		return genderID, nil
+	}
+
+	genderID, err = s.svc.db.Product().CreateGender(genderName)
+	if err != nil {
+		logger.Error("getColorIDByName.CreateGender: ", err)
+		return genderID, err
+	}
+
+	return genderID, nil
 }
 
 func (s *productService) firstLetterUppercase(str *string) {

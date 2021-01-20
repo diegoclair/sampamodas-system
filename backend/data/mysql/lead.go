@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
@@ -35,14 +34,12 @@ func (s *leadRepo) GetLeadAddress(leadID int64) (addresses []entity.Address, res
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("GetLeadAddress", err)
 		return addresses, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(leadID)
 	if err != nil {
-		logger.Error("GetLeadAddress", err)
 		return addresses, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -58,7 +55,6 @@ func (s *leadRepo) GetLeadAddress(leadID int64) (addresses []entity.Address, res
 			&address.FederativeUnit,
 		)
 		if err != nil {
-			logger.Error("GetLeadAddress", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		addresses = append(addresses, address)
@@ -86,7 +82,6 @@ func (s *leadRepo) CreateSale(sale entity.Sale) resterrors.RestErr {
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("CreateQRCode", err)
 		return resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -101,7 +96,6 @@ func (s *leadRepo) CreateSale(sale entity.Sale) resterrors.RestErr {
 		sale.AddressID,
 	)
 	if err != nil {
-		logger.Error("CreateQRCode", err)
 		return mysqlutils.HandleMySQLError(err)
 	}
 
@@ -125,14 +119,12 @@ func (s *leadRepo) GetSaleSummary(leadID int64) (summary []entity.SaleSummary, r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("GetSaleSummary", err)
 		return summary, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(leadID)
 	if err != nil {
-		logger.Error("GetSaleSummary", err)
 		return summary, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -144,7 +136,6 @@ func (s *leadRepo) GetSaleSummary(leadID int64) (summary []entity.SaleSummary, r
 			&saleSummary.Freight,
 		)
 		if err != nil {
-			logger.Error("GetSaleSummary", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		summary = append(summary, saleSummary)

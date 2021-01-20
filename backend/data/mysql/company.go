@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
@@ -32,7 +31,6 @@ func (s *companyRepo) CreateCompany(company entity.Company) resterrors.RestErr {
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("companyRepo.CreateCompany", err)
 		return resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -43,7 +41,6 @@ func (s *companyRepo) CreateCompany(company entity.Company) resterrors.RestErr {
 		company.CommercialName,
 	)
 	if err != nil {
-		logger.Error("companyRepo.CreateCompany", err)
 		return mysqlutils.HandleMySQLError(err)
 	}
 
@@ -64,14 +61,12 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, restErr rester
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("companyRepo.GetCompanies: ", err)
 		return companies, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {
-		logger.Error("companyRepo.GetCompanies: ", err)
 		return companies, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -84,7 +79,6 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, restErr rester
 			&company.CommercialName,
 		)
 		if err != nil {
-			logger.Error("companyRepo.GetCompanies: ", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		companies = append(companies, company)
@@ -108,14 +102,12 @@ func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("companyRepo.GetCompany: ", err)
 		return company, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(companyID)
 	if err != nil {
-		logger.Error("companyRepo.GetCompany: ", err)
 		return company, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -126,7 +118,6 @@ func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, r
 		&company.CommercialName,
 	)
 	if err != nil {
-		logger.Error("companyRepo.GetCompany: ", err)
 		return company, mysqlutils.HandleMySQLError(err)
 	}
 

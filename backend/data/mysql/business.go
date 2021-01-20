@@ -1,7 +1,6 @@
 package mysql
 
 import (
-	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
@@ -31,7 +30,6 @@ func (s *businessRepo) CreateBusiness(business entity.Business) resterrors.RestE
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("businessRepo.CreateBusiness", err)
 		return resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
@@ -41,7 +39,6 @@ func (s *businessRepo) CreateBusiness(business entity.Business) resterrors.RestE
 		business.Name,
 	)
 	if err != nil {
-		logger.Error("businessRepo.CreateBusiness", err)
 		return mysqlutils.HandleMySQLError(err)
 	}
 
@@ -61,14 +58,12 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, restErr re
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("businessRepo.GetBusinesses: ", err)
 		return businesses, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {
-		logger.Error("businessRepo.GetBusinesses: ", err)
 		return businesses, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -80,7 +75,6 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, restErr re
 			&business.Name,
 		)
 		if err != nil {
-			logger.Error("businessRepo.GetBusinesses: ", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		businesses = append(businesses, business)
@@ -103,14 +97,12 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("businessRepo.GetBusiness: ", err)
 		return business, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(businessID)
 	if err != nil {
-		logger.Error("businessRepo.GetBusiness: ", err)
 		return business, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -120,7 +112,6 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 		&business.Name,
 	)
 	if err != nil {
-		logger.Error("businessRepo.GetBusiness: ", err)
 		return business, mysqlutils.HandleMySQLError(err)
 	}
 
@@ -141,14 +132,12 @@ func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []e
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		logger.Error("businessRepo.GetBusinessesByCompanyID: ", err)
 		return businesses, resterrors.NewInternalServerError("Database error")
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(companyID)
 	if err != nil {
-		logger.Error("businessRepo.GetBusinessesByCompanyID: ", err)
 		return businesses, resterrors.NewInternalServerError("Database error")
 	}
 
@@ -160,7 +149,6 @@ func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []e
 			&business.Name,
 		)
 		if err != nil {
-			logger.Error("businessRepo.GetBusinessesByCompanyID: ", err)
 			return nil, mysqlutils.HandleMySQLError(err)
 		}
 		businesses = append(businesses, business)
