@@ -7,12 +7,13 @@ import (
 
 //RepoManager defines the repository aggregator interface
 type RepoManager interface {
+	Business() BusinessRepo
 	Company() CompanyRepo
 	Lead() LeadRepo
-	Business() BusinessRepo
+	Product() ProductRepo
 }
 
-// BusinessRepo defines the data set for qrcode
+// BusinessRepo defines the data set for business repo
 type BusinessRepo interface {
 	CreateBusiness(company entity.Business) resterrors.RestErr
 	GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr)
@@ -20,7 +21,7 @@ type BusinessRepo interface {
 	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr)
 }
 
-// CompanyRepo defines the data set for qrcode
+// CompanyRepo defines the data set for company repo
 type CompanyRepo interface {
 	CreateCompany(company entity.Company) resterrors.RestErr
 	GetCompanies() (companies []entity.Company, restErr resterrors.RestErr)
@@ -29,7 +30,26 @@ type CompanyRepo interface {
 
 // LeadRepo defines the data set for lead
 type LeadRepo interface {
-	GetLeadAddress(leadID int64) (address []entity.Address, err resterrors.RestErr)
-	CreateSale(sale entity.Sale) (err resterrors.RestErr)
+	CreateSale(sale entity.Sale) (restErr resterrors.RestErr)
+	GetLeadAddress(leadID int64) (address []entity.Address, restErr resterrors.RestErr)
 	GetSaleSummary(leadID int64) (summary []entity.SaleSummary, restErr resterrors.RestErr)
+}
+
+// ProductRepo defines the data set for product repo
+type ProductRepo interface {
+	CreateProduct(product entity.Product) (productID int64, restErr resterrors.RestErr)
+	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
+	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
+
+	CreateProductStock(productID int64, product entity.ProductStock) resterrors.RestErr
+	GetStockProductByID(productID int64) (product []entity.ProductStock, restErr resterrors.RestErr)
+
+	CreateBrand(brandName string) (brandID int64, restErr resterrors.RestErr)
+	GetBrandByName(brandName string) (brandID int64, restErr resterrors.RestErr)
+
+	CreateColor(colorName string) (colorID int64, restErr resterrors.RestErr)
+	GetColorByName(colorName string) (colorID int64, restErr resterrors.RestErr)
+
+	CreateGender(genderName string) (genderID int64, restErr resterrors.RestErr)
+	GetGenderByName(genderName string) (genderID int64, restErr resterrors.RestErr)
 }

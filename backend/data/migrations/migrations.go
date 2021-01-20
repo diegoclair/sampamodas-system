@@ -57,23 +57,36 @@ var (
 		},
 		{
 			Version:     4,
+			Description: "Create tab_gender",
+			Script: `
+				CREATE TABLE IF NOT EXISTS tab_gender (
+					id INT NOT NULL AUTO_INCREMENT,
+					name VARCHAR(45) NOT NULL,
+					PRIMARY KEY (id),
+					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE)
+				ENGINE=InnoDB CHARACTER SET=utf8;
+			`,
+		},
+		{
+			Version:     5,
 			Description: "Create tab_product",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_product (
 					id INT NOT NULL AUTO_INCREMENT,
 					name VARCHAR(45) NOT NULL,
-					cost DECIMAL NULL DEFAULT 0.00,
-					price DECIMAL NULL DEFAULT 0.00,
-					gender_type VARCHAR(45) NOT NULL,
+					cost DECIMAL(7,2) NULL DEFAULT 0.00,
+					price DECIMAL(7,2) NULL DEFAULT 0.00,
+					gender_id INT NOT NULL,
 					business_id INT NOT NULL,
 					brand_id INT NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (id),
 					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE,
-					INDEX fk_tab_products_tab_company1_idx (business_id ASC) VISIBLE,
+					INDEX fk_tab_product_tab_business1_idx (business_id ASC) VISIBLE,
 					INDEX fk_tab_product_tab_brand1_idx (brand_id ASC) VISIBLE,
-					CONSTRAINT fk_tab_products_tab_company1
+					INDEX fk_tab_product_tab_gender1_idx (gender_id ASC) VISIBLE,
+					CONSTRAINT fk_tab_products_tab_business1
 					FOREIGN KEY (business_id)
 					REFERENCES tab_business (id)
 					ON DELETE NO ACTION
@@ -82,12 +95,17 @@ var (
 					FOREIGN KEY (brand_id)
 					REFERENCES tab_brand (id)
 					ON DELETE NO ACTION
+					ON UPDATE NO ACTION,
+					CONSTRAINT fk_tab_product_tab_gender1
+					FOREIGN KEY (gender_id)
+					REFERENCES tab_gender (id)
+					ON DELETE NO ACTION
 					ON UPDATE NO ACTION)
-				ENGINE = InnoDB;
+				ENGINE=InnoDB CHARACTER SET=utf8;
 				`,
 		},
 		{
-			Version:     5,
+			Version:     6,
 			Description: "Create tab_lead",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_lead (
@@ -103,7 +121,7 @@ var (
 			`,
 		},
 		{
-			Version:     6,
+			Version:     7,
 			Description: "Create tab_send_method",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_send_method (
@@ -118,7 +136,7 @@ var (
 			`,
 		},
 		{
-			Version:     7,
+			Version:     8,
 			Description: "Create tab_payment_method",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_payment_method (
@@ -132,14 +150,14 @@ var (
 			`,
 		},
 		{
-			Version:     8,
+			Version:     9,
 			Description: "Create tab_sale",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_sale (
 					id INT NOT NULL AUTO_INCREMENT,
 					lead_id INT NOT NULL,
-					total_price DECIMAL NOT NULL DEFAULT 0.00,
-					freight DECIMAL GENERATED ALWAYS AS (0.00) VIRTUAL,
+					total_price DECIMAL(7,2) NOT NULL DEFAULT 0.00,
+					freight DECIMAL(7,2) GENERATED ALWAYS AS (0.00) VIRTUAL,
 					payment_method_id INT NULL,
 					send_method_id INT NULL,
 					PRIMARY KEY (id),
@@ -166,29 +184,50 @@ var (
 			`,
 		},
 		{
-			Version:     9,
+			Version:     10,
+			Description: "Create tab_color",
+			Script: `
+				CREATE TABLE IF NOT EXISTS tab_color (
+					id INT NOT NULL AUTO_INCREMENT,
+					name VARCHAR(45) NOT NULL,
+					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+					PRIMARY KEY (id),
+					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE)
+				ENGINE=InnoDB CHARACTER SET=utf8;
+			`,
+		},
+		{
+			Version:     11,
 			Description: "Create tab_product_stock",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_product_stock (
-					id INT NOT NULL,
+					id INT NOT NULL AUTO_INCREMENT,
 					product_id INT NOT NULL,
-					color VARCHAR(45) NULL,
+					color_id INT NOT NULL,
 					size VARCHAR(45) NOT NULL,
 					quantity INT NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (id),
-					INDEX fk_tab_product_quantity_tab_products1_idx (product_id ASC) VISIBLE,
+					INDEX fk_tab_product_stock_tab_product1_idx (product_id ASC) VISIBLE,
+					INDEX fk_tab_product_stock_tab_color1_idx (color_id ASC) VISIBLE,
+					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE,
 					CONSTRAINT fk_tab_product_quantity_tab_products1
-					FOREIGN KEY (product_id)
-					REFERENCES tab_product (id)
-					ON DELETE NO ACTION
-					ON UPDATE NO ACTION)
+						FOREIGN KEY (product_id)
+						REFERENCES tab_product (id)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION,
+					CONSTRAINT fk_tab_product_stock_tab_color1
+						FOREIGN KEY (color_id)
+						REFERENCES tab_color (id)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION)
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
 		},
 		{
-			Version:     10,
+			Version:     12,
 			Description: "Create tab_lead_address",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_lead_address (
@@ -216,7 +255,7 @@ var (
 			`,
 		},
 		{
-			Version:     11,
+			Version:     13,
 			Description: "Create tab_sale_product",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_sale_product (
@@ -224,7 +263,7 @@ var (
 					sale_id INT NOT NULL,
 					product_id INT NOT NULL,
 					quantity INT NOT NULL,
-					price DECIMAL NOT NULL DEFAULT 0.00,
+					price DECIMAL(7,2) NOT NULL DEFAULT 0.00,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (id),

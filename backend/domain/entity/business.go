@@ -1,6 +1,6 @@
 package entity
 
-// Business viewmodel
+// Business entity
 type Business struct {
 	ID        int64  `json:"id,omitempty"`
 	CompanyID int64  `json:"company_id,omitempty"`

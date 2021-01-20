@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"database/sql"
-
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
@@ -10,11 +8,11 @@ import (
 )
 
 type companyRepo struct {
-	db *sql.DB
+	db connection
 }
 
 // newCompanyRepo returns a instance of dbrepo
-func newCompanyRepo(db *sql.DB) *companyRepo {
+func newCompanyRepo(db connection) *companyRepo {
 	return &companyRepo{
 		db: db,
 	}

@@ -1,8 +1,6 @@
 package mysql
 
 import (
-	"database/sql"
-
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
 	"github.com/diegoclair/go_utils-lib/resterrors"
@@ -10,11 +8,11 @@ import (
 )
 
 type leadRepo struct {
-	db *sql.DB
+	db connection
 }
 
 // newLeadRepo returns a instance of dbrepo
-func newLeadRepo(db *sql.DB) *leadRepo {
+func newLeadRepo(db connection) *leadRepo {
 	return &leadRepo{
 		db: db,
 	}

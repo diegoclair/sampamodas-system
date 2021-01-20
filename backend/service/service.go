@@ -6,11 +6,11 @@ import (
 
 // Service holds the domain service repositories
 type Service struct {
-	db contract.RepoManager
+	db contract.DataManager
 }
 
 // New returns a new domain Service instance
-func New(db contract.RepoManager) *Service {
+func New(db contract.DataManager) *Service {
 	svc := new(Service)
 	svc.db = db
 
@@ -22,6 +22,7 @@ type Manager interface {
 	LeadService(svc *Service) contract.LeadService
 	CompanyService(svc *Service) contract.CompanyService
 	BusinessService(svc *Service) contract.BusinessService
+	ProductService(svc *Service) contract.ProductService
 }
 
 type serviceManager struct {
@@ -43,4 +44,8 @@ func (s *serviceManager) CompanyService(svc *Service) contract.CompanyService {
 
 func (s *serviceManager) LeadService(svc *Service) contract.LeadService {
 	return newLeadService(svc)
+}
+
+func (s *serviceManager) ProductService(svc *Service) contract.ProductService {
+	return newProductService(svc)
 }

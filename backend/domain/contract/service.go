@@ -9,7 +9,7 @@ import (
 type PingService interface {
 }
 
-// BusinessService holds a ping service operations
+// BusinessService holds a business service operations
 type BusinessService interface {
 	CreateBusiness(company entity.Business) resterrors.RestErr
 	GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr)
@@ -17,7 +17,7 @@ type BusinessService interface {
 	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr)
 }
 
-// CompanyService holds a ping service operations
+// CompanyService holds a company service operations
 type CompanyService interface {
 	CreateCompany(company entity.Company) resterrors.RestErr
 	GetCompanies() (companies []entity.Company, restErr resterrors.RestErr)
@@ -29,4 +29,11 @@ type LeadService interface {
 	GetLeadAddress(leadID int64) (address []entity.Address, err resterrors.RestErr)
 	CreateSale(sale entity.Sale) (saleNumber string, err resterrors.RestErr)
 	GetLeadSalesSummary(leadID int64) (summary []entity.SaleSummary, err resterrors.RestErr)
+}
+
+// ProductService holds a product service operations
+type ProductService interface {
+	CreateProduct(product entity.Product) resterrors.RestErr
+	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
+	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/diegoclair/sampamodas-system/backend/server/routes/companyroute"
 	"github.com/diegoclair/sampamodas-system/backend/server/routes/leadroute"
 	"github.com/diegoclair/sampamodas-system/backend/server/routes/pingroute"
+	"github.com/diegoclair/sampamodas-system/backend/server/routes/productroute"
 	"github.com/diegoclair/sampamodas-system/backend/service"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -16,6 +17,7 @@ type controller struct {
 	businessController *businessroute.Controller
 	companyController  *companyroute.Controller
 	leadController     *leadroute.Controller
+	productController  *productroute.Controller
 }
 
 //InitServer to initialize the server
@@ -24,9 +26,10 @@ func InitServer(svc *service.Service) *echo.Echo {
 	svm := service.NewServiceManager()
 	srv := echo.New()
 
-	leadService := svm.LeadService(svc)
 	businessService := svm.BusinessService(svc)
 	companyService := svm.CompanyService(svc)
+	leadService := svm.LeadService(svc)
+	productService := svm.ProductService(svc)
 
 	srv.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
@@ -35,6 +38,7 @@ func InitServer(svc *service.Service) *echo.Echo {
 		businessController: businessroute.NewController(businessService, mapper),
 		companyController:  companyroute.NewController(companyService, mapper),
 		leadController:     leadroute.NewController(leadService, mapper),
+		productController:  productroute.NewController(productService, mapper),
 	})
 }
 
@@ -45,6 +49,7 @@ func setupRoutes(srv *echo.Echo, s *controller) *echo.Echo {
 	businessroute.NewRouter(s.businessController, srv).RegisterRoutes()
 	companyroute.NewRouter(s.companyController, srv).RegisterRoutes()
 	leadroute.NewRouter(s.leadController, srv).RegisterRoutes()
+	productroute.NewRouter(s.productController, srv).RegisterRoutes()
 
 	return srv
 }
