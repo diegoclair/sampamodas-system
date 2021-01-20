@@ -75,6 +75,11 @@ func Instance() (contract.RepoManager, error) {
 	return instance, nil
 }
 
+//Business returns the company set
+func (c *DBManager) Business() contract.BusinessRepo {
+	return newBusinessRepo(c.db)
+}
+
 //Company returns the company set
 func (c *DBManager) Company() contract.CompanyRepo {
 	return newCompanyRepo(c.db)

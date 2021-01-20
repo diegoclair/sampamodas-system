@@ -4,21 +4,21 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// ComapanyRouter holds the lead handlers
-type ComapanyRouter struct {
+// CompanyRouter holds the company handlers
+type CompanyRouter struct {
 	ctrl   *Controller
 	router *echo.Echo
 }
 
-// NewRouter returns a new ComapanyRouter instance
-func NewRouter(ctrl *Controller, router *echo.Echo) *ComapanyRouter {
-	return &ComapanyRouter{
+// NewRouter returns a new CompanyRouter instance
+func NewRouter(ctrl *Controller, router *echo.Echo) *CompanyRouter {
+	return &CompanyRouter{
 		ctrl:   ctrl,
 		router: router,
 	}
 }
 
-//RegisterRoutes is a routers map of lead requests
-func (r *ComapanyRouter) RegisterRoutes() {
+//RegisterRoutes is a routers map of company requests
+func (r *CompanyRouter) RegisterRoutes() {
 	r.router.POST("/company/", r.ctrl.handleCreateCompany)
 }

@@ -21,6 +21,7 @@ func New(db contract.RepoManager) *Service {
 type Manager interface {
 	LeadService(svc *Service) contract.LeadService
 	CompanyService(svc *Service) contract.CompanyService
+	BusinessService(svc *Service) contract.BusinessService
 }
 
 type serviceManager struct {
@@ -32,10 +33,14 @@ func NewServiceManager() Manager {
 	return &serviceManager{}
 }
 
-func (s *serviceManager) LeadService(svc *Service) contract.LeadService {
-	return newLeadService(svc)
+func (s *serviceManager) BusinessService(svc *Service) contract.BusinessService {
+	return newBusinessService(svc)
 }
 
 func (s *serviceManager) CompanyService(svc *Service) contract.CompanyService {
 	return newCompanyService(svc)
+}
+
+func (s *serviceManager) LeadService(svc *Service) contract.LeadService {
+	return newLeadService(svc)
 }

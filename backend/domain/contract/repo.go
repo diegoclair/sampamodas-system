@@ -9,6 +9,12 @@ import (
 type RepoManager interface {
 	Company() CompanyRepo
 	Lead() LeadRepo
+	Business() BusinessRepo
+}
+
+// BusinessRepo defines the data set for qrcode
+type BusinessRepo interface {
+	CreateBusiness(company entity.Business) resterrors.RestErr
 }
 
 // CompanyRepo defines the data set for qrcode

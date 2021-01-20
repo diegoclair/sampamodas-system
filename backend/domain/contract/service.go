@@ -9,6 +9,11 @@ import (
 type PingService interface {
 }
 
+// BusinessService holds a ping service operations
+type BusinessService interface {
+	CreateBusiness(company entity.Business) resterrors.RestErr
+}
+
 // CompanyService holds a ping service operations
 type CompanyService interface {
 	CreateCompany(company entity.Company) resterrors.RestErr
