@@ -6,6 +6,6 @@ import (
 )
 
 // Connect returns a instace of cassandra db
-func Connect() (contract.RepoManager, error) {
+func Connect() (contract.DataManager, error) {
 	return mysql.Instance()
 }
