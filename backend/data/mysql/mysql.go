@@ -18,8 +18,8 @@ type DBManager struct {
 	db *sql.DB
 }
 
-//Instance returns an instance of a RepoManager
-func Instance() (contract.RepoManager, error) {
+//Instance returns an instance of a DataManager
+func Instance() (contract.DataManager, error) {
 	cfg := config.GetDBConfig()
 
 	dataSourceName := fmt.Sprintf("%s:root@tcp(%s:%s)/%s?charset=utf8",
@@ -75,6 +75,26 @@ func Instance() (contract.RepoManager, error) {
 	return instance, nil
 }
 
+// Begin starts a transaction
+func (c *DBManager) Begin() (contract.TransactionManager, error) {
+	tx, err := c.db.Begin()
+	if err != nil {
+		return nil, err
+	}
+
+	return newTransaction(tx), nil
+}
+
+// Close closes the db connection
+func (c *DBManager) Close() (err error) {
+	return c.db.Close()
+}
+
+//Business returns the company set
+func (c *DBManager) Business() contract.BusinessRepo {
+	return newBusinessRepo(c.db)
+}
+
 //Company returns the company set
 func (c *DBManager) Company() contract.CompanyRepo {
 	return newCompanyRepo(c.db)
@@ -83,4 +103,9 @@ func (c *DBManager) Company() contract.CompanyRepo {
 //Lead returns the company set
 func (c *DBManager) Lead() contract.LeadRepo {
 	return newLeadRepo(c.db)
+}
+
+//Product returns the company set
+func (c *DBManager) Product() contract.ProductRepo {
+	return newProductRepo(c.db)
 }

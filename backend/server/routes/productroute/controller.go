@@ -1,4 +1,4 @@
-package companyroute
+package productroute
 
 import (
 	"fmt"
@@ -23,41 +23,47 @@ var (
 
 //Controller is a interface to interact with services
 type Controller struct {
-	companyService contract.CompanyService
+	productService contract.ProductService
 	mapper         mapper.Mapper
 }
 
 //NewController to handle requests
-func NewController(companyService contract.CompanyService, mapper mapper.Mapper) *Controller {
+func NewController(productService contract.ProductService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
-			companyService: companyService,
+			productService: productService,
 			mapper:         mapper,
 		}
 	})
 	return instance
 }
 
-func (s *Controller) handleCreateCompany(c echo.Context) error {
+func (s *Controller) handleCreateProduct(c echo.Context) error {
 
-	input := viewmodel.Company{}
+	input := viewmodel.CreateProduct{}
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateCompany.c.Bind: ", err)
+		logger.Error("handleCreateProduct.c.Bind: ", err)
 		restErr := resterrors.NewBadRequestError("Invalid json body")
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	company := entity.Company{}
+	product := entity.Product{}
 
-	err = s.mapper.From(input).To(&company)
+	err = s.mapper.From(input).To(&product)
 	if err != nil {
 		restErr := resterrors.NewInternalServerError("Error to do the mapper: " + fmt.Sprint(err))
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	restErr := s.companyService.CreateCompany(company)
+	product.Brand.Name = input.BrandName
+	product.Gender.Name = input.GenderName
+	for i := range input.ProductStock {
+		product.ProductStock[i].Color.Name = input.ProductStock[i].Color
+	}
+
+	restErr := s.productService.CreateProduct(product)
 	if restErr != nil {
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
@@ -65,15 +71,15 @@ func (s *Controller) handleCreateCompany(c echo.Context) error {
 	return c.NoContent(http.StatusNoContent)
 }
 
-func (s *Controller) handleGetCompanies(c echo.Context) error {
+func (s *Controller) handleGetProducts(c echo.Context) error {
 
-	companies, restErr := s.companyService.GetCompanies()
+	products, restErr := s.productService.GetProducts()
 	if restErr != nil {
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	response := []viewmodel.Company{}
-	err := s.mapper.From(companies).To(&response)
+	response := []viewmodel.Product{}
+	err := s.mapper.From(products).To(&response)
 	if err != nil {
 		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
 		return c.JSON(restErr.StatusCode(), restErr)
@@ -82,21 +88,21 @@ func (s *Controller) handleGetCompanies(c echo.Context) error {
 	return c.JSON(http.StatusOK, response)
 }
 
-func (s *Controller) handleGetCompanyByID(c echo.Context) error {
+func (s *Controller) handleGetProductByID(c echo.Context) error {
 
-	companyID, err := strconv.Atoi(c.Param("id"))
+	productID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		restErr := resterrors.NewBadRequestError("id parameter is invalid")
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	company, restErr := s.companyService.GetCompanyByID(int64(companyID))
+	product, restErr := s.productService.GetProductByID(int64(productID))
 	if restErr != nil {
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	response := viewmodel.Company{}
-	err = s.mapper.From(company).To(&response)
+	response := viewmodel.Product{}
+	err = s.mapper.From(product).To(&response)
 	if err != nil {
 		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
 		return c.JSON(restErr.StatusCode(), restErr)
