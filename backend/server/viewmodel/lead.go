@@ -12,16 +12,16 @@ type Lead struct {
 
 // LeadAddress viewmodel
 type LeadAddress struct {
-	ID              int64  `json:"id,omitempty"`
-	LeadID          int64  `json:"lead_id,omitempty"`
-	AddressType     string `json:"address_type,omitempty"`
-	Street          string `json:"street,omitempty"`
-	Number          string `json:"number,omitempty"`
-	Neighborhood    string `json:"neighborhood,omitempty"`
-	Complement      string `json:"complement,omitempty"`
-	City            string `json:"city,omitempty"`
-	FederativeUInit string `json:"federative_u_init,omitempty"`
-	ZipCode         string `json:"zip_code,omitempty"`
+	ID             int64  `json:"id,omitempty"`
+	LeadID         int64  `json:"lead_id,omitempty"`
+	AddressType    string `json:"address_type,omitempty"`
+	Street         string `json:"street,omitempty"`
+	Number         string `json:"number,omitempty"`
+	Neighborhood   string `json:"neighborhood,omitempty"`
+	Complement     string `json:"complement,omitempty"`
+	City           string `json:"city,omitempty"`
+	FederativeUnit string `json:"federative_unit,omitempty"`
+	ZipCode        string `json:"zip_code,omitempty"`
 }
 
 // CreateLeadResponse viewmodel

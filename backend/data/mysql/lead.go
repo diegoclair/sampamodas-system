@@ -96,7 +96,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 			&address.Neighborhood,
 			&address.Complement,
 			&address.City,
-			&address.FederativeUInit,
+			&address.FederativeUnit,
 			&address.ZipCode,
 		)
 		if err != nil {
@@ -177,7 +177,7 @@ func (s *leadRepo) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.
 		leadAddress.Neighborhood,
 		leadAddress.Complement,
 		leadAddress.City,
-		leadAddress.FederativeUInit,
+		leadAddress.FederativeUnit,
 		leadAddress.ZipCode,
 	)
 	if err != nil {
