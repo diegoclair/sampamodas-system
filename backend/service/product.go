@@ -2,13 +2,13 @@ package service
 
 import (
 	"regexp"
-	"strings"
 
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/infra/format"
 )
 
 type productService struct {
@@ -45,7 +45,7 @@ func (s *productService) GetProductByID(productID int64) (product entity.Product
 
 func (s *productService) CreateProduct(product entity.Product) (err resterrors.RestErr) {
 
-	s.firstLetterUppercase(&product.Name)
+	format.FirstLetterUpperCase(&product.Name)
 
 	product.Brand.ID, err = s.getBrandIDByName(product.Brand.Name)
 	if err != nil {
@@ -72,7 +72,7 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 
 	for i := range product.ProductStock {
 
-		s.firstLetterUppercase(&product.ProductStock[i].Size)
+		format.FirstLetterUpperCase(&product.ProductStock[i].Size)
 
 		product.ProductStock[i].Color.ID, err = s.getColorIDByName(product.ProductStock[i].Color.Name)
 		if err != nil {
@@ -99,7 +99,7 @@ var noSQLRowsRE = regexp.MustCompile(domain.NoSQLRows)
 
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {
 
-	s.firstLetterUppercase(&brandName)
+	format.FirstLetterUpperCase(&brandName)
 	brandID, err = s.svc.db.Product().GetBrandByName(brandName)
 	if err != nil {
 		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
@@ -124,7 +124,7 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 
 func (s *productService) getColorIDByName(colorName string) (colorID int64, err resterrors.RestErr) {
 
-	s.firstLetterUppercase(&colorName)
+	format.FirstLetterUpperCase(&colorName)
 	colorID, err = s.svc.db.Product().GetColorByName(colorName)
 	if err != nil {
 		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
@@ -149,7 +149,7 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 
 func (s *productService) getGenderIDByName(genderName string) (genderID int64, err resterrors.RestErr) {
 
-	s.firstLetterUppercase(&genderName)
+	format.FirstLetterUpperCase(&genderName)
 	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
 	if err != nil {
 		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
@@ -170,8 +170,4 @@ func (s *productService) getGenderIDByName(genderName string) (genderID int64, e
 	}
 
 	return genderID, nil
-}
-
-func (s *productService) firstLetterUppercase(str *string) {
-	*str = strings.Title(strings.ToLower(*str))
 }

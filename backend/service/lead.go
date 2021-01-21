@@ -5,6 +5,7 @@ import (
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/infra/format"
 )
 
 type leadService struct {
@@ -37,6 +38,7 @@ func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead
 
 func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr) {
 
+	format.FirstLetterUpperCase(&lead.Name)
 	leadID, restErr = s.svc.db.Lead().CreateLead(lead)
 	if restErr != nil {
 		logger.Error("leadService.CreateLead.CreateLead: ", restErr)
@@ -48,6 +50,10 @@ func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, restErr rester
 
 func (s *leadService) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr {
 
+	format.FirstLetterUpperCase(&leadAddress.Street)
+	format.FirstLetterUpperCase(&leadAddress.Neighborhood)
+	format.FirstLetterUpperCase(&leadAddress.City)
+	format.ToUpperCase(&leadAddress.FederativeUnit)
 	restErr := s.svc.db.Lead().CreateLeadAddress(leadAddress)
 	if restErr != nil {
 		logger.Error("leadService.CreateLeadAddress.CreateLeadAddress: ", restErr)
