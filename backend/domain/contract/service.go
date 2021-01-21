@@ -26,7 +26,7 @@ type CompanyService interface {
 
 // LeadService holds a lead service operations
 type LeadService interface {
-	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err resterrors.RestErr)
+	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr)
 }
 
 // ProductService holds a product service operations

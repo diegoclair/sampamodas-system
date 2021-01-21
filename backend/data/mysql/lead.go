@@ -55,7 +55,7 @@ func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, r
 	return lead, nil
 }
 
-func (s *leadRepo) GetLeadAddressByID(leadID int64) (addresses []entity.LeadAddress, restErr resterrors.RestErr) {
+func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, restErr resterrors.RestErr) {
 
 	query := `
 		SELECT
@@ -104,4 +104,83 @@ func (s *leadRepo) GetLeadAddressByID(leadID int64) (addresses []entity.LeadAddr
 	}
 
 	return addresses, nil
+}
+
+func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr) {
+
+	query := `
+		INSERT INTO tab_lead (
+			name,
+			email,
+			phone_number,
+			instagram
+		) 
+		VALUES	
+			(?, ?, ?, ?);
+		`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return leadID, resterrors.NewInternalServerError("Database error")
+	}
+	defer stmt.Close()
+
+	result, err := stmt.Exec(
+		lead.Name,
+		lead.Email,
+		lead.PhoneNumber,
+		lead.Instagram,
+	)
+	if err != nil {
+		return leadID, mysqlutils.HandleMySQLError(err)
+	}
+
+	leadID, err = result.LastInsertId()
+	if err != nil {
+		return leadID, mysqlutils.HandleMySQLError(err)
+	}
+
+	return leadID, nil
+}
+
+func (s *leadRepo) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr {
+
+	query := `
+		INSERT INTO tab_lead_address (
+			lead_id,
+			address_type,
+			street,
+			number,
+			neighborhood,
+			complement,
+			city,
+			federative_unit,
+			zip_code
+		) 
+		VALUES	
+			(?, ?, ?, ?, ?, ?, ?, ?, ?);
+		`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return resterrors.NewInternalServerError("Database error")
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		leadAddress.LeadID,
+		leadAddress.AddressType,
+		leadAddress.Street,
+		leadAddress.Number,
+		leadAddress.Neighborhood,
+		leadAddress.Complement,
+		leadAddress.City,
+		leadAddress.FederativeUInit,
+		leadAddress.ZipCode,
+	)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+
+	return nil
 }

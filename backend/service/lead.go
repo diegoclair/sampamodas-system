@@ -26,11 +26,31 @@ func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead
 		return lead, restErr
 	}
 
-	lead.LeadAddress, restErr = s.svc.db.Lead().GetLeadAddressByID(lead.ID)
+	lead.LeadAddress, restErr = s.svc.db.Lead().GetLeadAddressByLeadID(lead.ID)
 	if restErr != nil {
-		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadAddressByID: ", restErr)
+		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadAddressByLeadID: ", restErr)
 		return lead, restErr
 	}
 
 	return lead, nil
+}
+
+func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr) {
+
+	leadID, restErr = s.svc.db.Lead().CreateLead(lead)
+	if restErr != nil {
+		logger.Error("leadService.CreateLead.CreateLead: ", restErr)
+		return leadID, restErr
+	}
+
+	for i := range lead.LeadAddress {
+		lead.LeadAddress[i].LeadID = leadID
+		restErr := s.svc.db.Lead().CreateLeadAddress(lead.LeadAddress[i])
+		if restErr != nil {
+			logger.Error("leadService.CreateLead.CreateLeadAddress: ", restErr)
+			return leadID, restErr
+		}
+	}
+
+	return leadID, nil
 }
