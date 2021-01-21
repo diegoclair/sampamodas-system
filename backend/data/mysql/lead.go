@@ -60,6 +60,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 	query := `
 		SELECT
 			tla.id,
+			tla.lead_id,
 			tla.address_type,
 			tla.street,
 			tla.number,
@@ -88,6 +89,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 	for rows.Next() {
 		err = rows.Scan(
 			&address.ID,
+			&address.LeadID,
 			&address.AddressType,
 			&address.Street,
 			&address.Number,
