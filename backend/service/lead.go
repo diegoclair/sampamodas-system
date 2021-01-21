@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
@@ -17,21 +18,41 @@ func newLeadService(svc *Service) contract.LeadService {
 	}
 }
 
-func (s *leadService) GetLeadAddress(leadID int64) (address []entity.Address, err resterrors.RestErr) {
-	return s.svc.db.Lead().GetLeadAddress(leadID)
-}
+func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr) {
 
-func (s *leadService) GetLeadSalesSummary(leadID int64) (summary []entity.SaleSummary, err resterrors.RestErr) {
-
-	return s.svc.db.Lead().GetSaleSummary(leadID)
-}
-
-func (s *leadService) CreateSale(sale entity.Sale) (saleNumber string, err resterrors.RestErr) {
-
-	err = s.svc.db.Lead().CreateSale(sale)
-	if err != nil {
-		return saleNumber, err
+	lead, restErr = s.svc.db.Lead().GetLeadByPhoneNumber(phoneNumber)
+	if restErr != nil {
+		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadByPhoneNumber: ", restErr)
+		return lead, restErr
 	}
 
-	return saleNumber, nil
+	lead.LeadAddress, restErr = s.svc.db.Lead().GetLeadAddressByLeadID(lead.ID)
+	if restErr != nil {
+		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadAddressByLeadID: ", restErr)
+		return lead, restErr
+	}
+
+	return lead, nil
+}
+
+func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr) {
+
+	leadID, restErr = s.svc.db.Lead().CreateLead(lead)
+	if restErr != nil {
+		logger.Error("leadService.CreateLead.CreateLead: ", restErr)
+		return leadID, restErr
+	}
+
+	return leadID, nil
+}
+
+func (s *leadService) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr {
+
+	restErr := s.svc.db.Lead().CreateLeadAddress(leadAddress)
+	if restErr != nil {
+		logger.Error("leadService.CreateLeadAddress.CreateLeadAddress: ", restErr)
+		return restErr
+	}
+
+	return nil
 }

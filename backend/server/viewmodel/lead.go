@@ -1,27 +1,30 @@
 package viewmodel
 
-// Address model
-type Address struct {
-	ID             int64  `json:"id,omitempty"`
-	Country        string `json:"country,omitempty"`
-	Street         string `json:"street,omitempty"`
-	Number         string `json:"number,omitempty"`
-	Complement     string `json:"complement,omitempty"`
-	ZipCode        string `json:"zip_code,omitempty"`
-	City           string `json:"city,omitempty"`
-	FederativeUnit string `json:"federative_unit,omitempty"`
+// Lead viewmodel
+type Lead struct {
+	ID          int64         `json:"id,omitempty"`
+	Name        string        `json:"name,omitempty"`
+	Email       string        `json:"email,omitempty"`
+	PhoneNumber string        `json:"phone_number,omitempty"`
+	Instagram   string        `json:"instagram,omitempty"`
+	LeadAddress []LeadAddress `json:"lead_address,omitempty"`
 }
 
-// Sale model
-type Sale struct {
-	PaymentMethodID int64   `json:"payment_method_id,omitempty"`
-	AddressID       int64   `json:"address_id,omitempty"`
-	Freight         float64 `json:"freight,omitempty"`
+// LeadAddress viewmodel
+type LeadAddress struct {
+	ID              int64  `json:"id,omitempty"`
+	LeadID          int64  `json:"lead_id,omitempty"`
+	AddressType     string `json:"address_type,omitempty"`
+	Street          string `json:"street,omitempty"`
+	Number          string `json:"number,omitempty"`
+	Neighborhood    string `json:"neighborhood,omitempty"`
+	Complement      string `json:"complement,omitempty"`
+	City            string `json:"city,omitempty"`
+	FederativeUInit string `json:"federative_u_init,omitempty"`
+	ZipCode         string `json:"zip_code,omitempty"`
 }
 
-// SaleSummary model
-type SaleSummary struct {
-	CompanyName string  `json:"company_name,omitempty"`
-	Price       float64 `json:"price,omitempty"`
-	Freight     float64 `json:"freight,omitempty"`
+// CreateLeadResponse viewmodel
+type CreateLeadResponse struct {
+	LeadID int64 `json:"lead_id,omitempty"`
 }

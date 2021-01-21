@@ -112,10 +112,11 @@ var (
 					id INT NOT NULL AUTO_INCREMENT,
 					name VARCHAR(45) NULL,
 					email VARCHAR(45) NULL,
-					phone_number VARCHAR(45) NULL,
+					phone_number VARCHAR(45) NOT NULL,
+					instagram VARCHAR(45) NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-					PRIMARY KEY (id),
+					PRIMARY KEY (id, phone_number),
 					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE)
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
@@ -141,7 +142,7 @@ var (
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_payment_method (
 					id INT NOT NULL AUTO_INCREMENT,
-					method_name VARCHAR(45) NOT NULL,
+					name VARCHAR(45) NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (id),
@@ -158,8 +159,8 @@ var (
 					lead_id INT NOT NULL,
 					total_price DECIMAL(7,2) NOT NULL DEFAULT 0.00,
 					freight DECIMAL(7,2) GENERATED ALWAYS AS (0.00) VIRTUAL,
-					payment_method_id INT NULL,
-					send_method_id INT NULL,
+					payment_method_id INT NOT NULL,
+					send_method_id INT NOT NULL,
 					PRIMARY KEY (id),
 					INDEX fk_tab_sale_tab_lead1_idx (lead_id ASC) VISIBLE,
 					INDEX fk_tab_sale_tab_send_method1_idx (send_method_id ASC) VISIBLE,
@@ -213,7 +214,7 @@ var (
 					INDEX fk_tab_product_stock_tab_product1_idx (product_id ASC) VISIBLE,
 					INDEX fk_tab_product_stock_tab_color1_idx (color_id ASC) VISIBLE,
 					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE,
-					CONSTRAINT fk_tab_product_quantity_tab_products1
+					CONSTRAINT fk_tab_product_stock_tab_product1
 						FOREIGN KEY (product_id)
 						REFERENCES tab_product (id)
 						ON DELETE NO ACTION
@@ -234,13 +235,13 @@ var (
 					id INT NOT NULL AUTO_INCREMENT,
 					lead_id INT NOT NULL,
 					address_type VARCHAR(45) NULL COMMENT 'if its home, work, etc..',
-					street VARCHAR(100) NULL,
-					number VARCHAR(45) NULL,
-					neighborhood VARCHAR(45) NULL,
-					complement VARCHAR(45) NULL,
-					city VARCHAR(45) NULL,
-					federative_unit VARCHAR(2) NULL,
-					zip_code VARCHAR(45) NULL,
+					street VARCHAR(100) NOT NULL,
+					number VARCHAR(45) NOT NULL,
+					neighborhood VARCHAR(45) NOT NULL,
+					complement VARCHAR(45) NOT NULL,
+					city VARCHAR(45) NOT NULL,
+					federative_unit VARCHAR(2) NOT NULL,
+					zip_code VARCHAR(45) NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (id),
@@ -261,7 +262,7 @@ var (
 				CREATE TABLE IF NOT EXISTS tab_sale_product (
 					id INT NOT NULL AUTO_INCREMENT,
 					sale_id INT NOT NULL,
-					product_id INT NOT NULL,
+					product_stock_id INT NOT NULL,
 					quantity INT NOT NULL,
 					price DECIMAL(7,2) NOT NULL DEFAULT 0.00,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -269,17 +270,17 @@ var (
 					PRIMARY KEY (id),
 					UNIQUE INDEX id_UNIQUE (id ASC) VISIBLE,
 					INDEX fk_tab_sale_products_tab_sale1_idx (sale_id ASC) VISIBLE,
-					INDEX fk_tab_sale_products_tab_products1_idx (product_id ASC) VISIBLE,
+					INDEX fk_tab_sale_product_tab_product_stock1_idx (product_stock_id ASC) VISIBLE,
 					CONSTRAINT fk_tab_sale_products_tab_sale1
-					FOREIGN KEY (sale_id)
-					REFERENCES tab_sale (id)
-					ON DELETE NO ACTION
-					ON UPDATE NO ACTION,
-					CONSTRAINT fk_tab_sale_products_tab_products1
-					FOREIGN KEY (product_id)
-					REFERENCES tab_product (id)
-					ON DELETE NO ACTION
-					ON UPDATE NO ACTION)
+						FOREIGN KEY (sale_id)
+						REFERENCES tab_sale (id)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION,
+					CONSTRAINT fk_tab_sale_product_tab_product_stock1
+						FOREIGN KEY (product_stock_id)
+						REFERENCES tab_product_stock (id)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION)
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
 		},

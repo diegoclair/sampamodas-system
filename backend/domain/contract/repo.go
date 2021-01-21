@@ -30,9 +30,10 @@ type CompanyRepo interface {
 
 // LeadRepo defines the data set for lead
 type LeadRepo interface {
-	CreateSale(sale entity.Sale) (restErr resterrors.RestErr)
-	GetLeadAddress(leadID int64) (address []entity.Address, restErr resterrors.RestErr)
-	GetSaleSummary(leadID int64) (summary []entity.SaleSummary, restErr resterrors.RestErr)
+	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr)
+	GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, restErr resterrors.RestErr)
+	CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr)
+	CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr
 }
 
 // ProductRepo defines the data set for product repo
