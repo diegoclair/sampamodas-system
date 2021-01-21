@@ -53,7 +53,7 @@ func (s *Controller) handleCreateCompany(c echo.Context) error {
 
 	err = s.mapper.From(input).To(&company)
 	if err != nil {
-		restErr := resterrors.NewInternalServerError("Error to do the mapper: " + fmt.Sprint(err))
+		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 

@@ -23,3 +23,8 @@ type LeadAddress struct {
 	FederativeUInit string `json:"federative_u_init,omitempty"`
 	ZipCode         string `json:"zip_code,omitempty"`
 }
+
+// CreateLeadResponse viewmodel
+type CreateLeadResponse struct {
+	LeadID int64 `json:"lead_id,omitempty"`
+}

@@ -43,14 +43,16 @@ func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, restErr rester
 		return leadID, restErr
 	}
 
-	for i := range lead.LeadAddress {
-		lead.LeadAddress[i].LeadID = leadID
-		restErr := s.svc.db.Lead().CreateLeadAddress(lead.LeadAddress[i])
-		if restErr != nil {
-			logger.Error("leadService.CreateLead.CreateLeadAddress: ", restErr)
-			return leadID, restErr
-		}
+	return leadID, nil
+}
+
+func (s *leadService) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr {
+
+	restErr := s.svc.db.Lead().CreateLeadAddress(leadAddress)
+	if restErr != nil {
+		logger.Error("leadService.CreateLeadAddress.CreateLeadAddress: ", restErr)
+		return restErr
 	}
 
-	return leadID, nil
+	return nil
 }

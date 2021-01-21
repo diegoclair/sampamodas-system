@@ -26,6 +26,8 @@ type CompanyService interface {
 
 // LeadService holds a lead service operations
 type LeadService interface {
+	CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr)
+	CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr
 	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr)
 }
 
@@ -34,4 +36,12 @@ type ProductService interface {
 	CreateProduct(product entity.Product) resterrors.RestErr
 	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
 	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
+}
+
+// SaleService holds a sale service operations
+type SaleService interface {
+	CreateSale(sale entity.Sale) (saleID int64, restErr resterrors.RestErr)
+	CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.RestErr
+	GetSales() (sales []entity.Sale, restErr resterrors.RestErr)
+	GetSaleByID(saleID int64) (sale entity.Sale, restErr resterrors.RestErr)
 }
