@@ -17,20 +17,61 @@ func newLeadRepo(db connection) *leadRepo {
 	}
 }
 
-func (s *leadRepo) GetLeadAddress(leadID int64) (addresses []entity.Address, restErr resterrors.RestErr) {
+func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr) {
 
 	query := `
 		SELECT
-		tua.id,
-		tua.street,
-		tua.number,
-		tua.complement,
-		tua.zip_code,
-		tua.city,
-		tua.federative_unit
+			tl.id,
+			tl.name,
+			tl.email,
+			tl.phone_number,
+			tl.instagram
 
-		FROM 	tab_lead_address 	tua
-		WHERE  	tua.lead_id = ?`
+		FROM 	tab_lead 		tl
+		WHERE  	tl.phone_number = ?`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return lead, resterrors.NewInternalServerError("Database error")
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(phoneNumber)
+	if err != nil {
+		return lead, resterrors.NewInternalServerError("Database error")
+	}
+
+	err = row.Scan(
+		&lead.ID,
+		&lead.Name,
+		&lead.Email,
+		&lead.PhoneNumber,
+		&lead.Instagram,
+	)
+	if err != nil {
+		return lead, mysqlutils.HandleMySQLError(err)
+	}
+
+	return lead, nil
+}
+
+func (s *leadRepo) GetLeadAddressByID(leadID int64) (addresses []entity.LeadAddress, restErr resterrors.RestErr) {
+
+	query := `
+		SELECT
+			tla.id,
+			tla.address_type,
+			tla.street,
+			tla.number,
+			tla.neighborhood,
+			tla.complement,
+			tla.city,
+			tla.federative_unit,
+			tla.zip_code
+
+		FROM 	tab_lead_address tla
+
+		WHERE  	tla.lead_id = ?`
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
@@ -43,16 +84,18 @@ func (s *leadRepo) GetLeadAddress(leadID int64) (addresses []entity.Address, res
 		return addresses, resterrors.NewInternalServerError("Database error")
 	}
 
-	var address entity.Address
+	var address entity.LeadAddress
 	for rows.Next() {
 		err = rows.Scan(
 			&address.ID,
+			&address.AddressType,
 			&address.Street,
 			&address.Number,
+			&address.Neighborhood,
 			&address.Complement,
-			&address.ZipCode,
 			&address.City,
-			&address.FederativeUnit,
+			&address.FederativeUInit,
+			&address.ZipCode,
 		)
 		if err != nil {
 			return nil, mysqlutils.HandleMySQLError(err)
@@ -61,85 +104,4 @@ func (s *leadRepo) GetLeadAddress(leadID int64) (addresses []entity.Address, res
 	}
 
 	return addresses, nil
-}
-
-func (s *leadRepo) CreateSale(sale entity.Sale) resterrors.RestErr {
-
-	query := `
-		INSERT INTO tab_sale (
-			lead_id,
-			company_id,
-			price,
-			freight,
-			qrcode_id,
-			product_id,
-			payment_type,
-			address_id
-		) 
-		VALUES	
-			(?, ?, ?, ?, ?, ?, ?, ?);
-		`
-
-	stmt, err := s.db.Prepare(query)
-	if err != nil {
-		return resterrors.NewInternalServerError("Database error")
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(
-		sale.LeadID,
-		sale.CompanyID,
-		sale.Price,
-		sale.Freight,
-		sale.ProductID,
-		sale.PaymentMethodID,
-		sale.AddressID,
-	)
-	if err != nil {
-		return mysqlutils.HandleMySQLError(err)
-	}
-
-	return nil
-}
-
-func (s *leadRepo) GetSaleSummary(leadID int64) (summary []entity.SaleSummary, restErr resterrors.RestErr) {
-
-	query := `
-		SELECT
-			tcp.name,
-			o.price,
-			o.freight
-
-		FROM 	tab_sale 	o
-
-		INNER JOIN tab_company_partners tcp
-			ON o.company_id = tcp.id
-
-		WHERE  	o.lead_id = ?`
-
-	stmt, err := s.db.Prepare(query)
-	if err != nil {
-		return summary, resterrors.NewInternalServerError("Database error")
-	}
-	defer stmt.Close()
-
-	rows, err := stmt.Query(leadID)
-	if err != nil {
-		return summary, resterrors.NewInternalServerError("Database error")
-	}
-
-	var saleSummary entity.SaleSummary
-	for rows.Next() {
-		err = rows.Scan(
-			&saleSummary.CompanyName,
-			&saleSummary.Price,
-			&saleSummary.Freight,
-		)
-		if err != nil {
-			return nil, mysqlutils.HandleMySQLError(err)
-		}
-		summary = append(summary, saleSummary)
-	}
-
-	return summary, nil
 }

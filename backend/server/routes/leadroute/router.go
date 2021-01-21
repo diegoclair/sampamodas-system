@@ -20,7 +20,5 @@ func NewRouter(ctrl *Controller, router *echo.Echo) *LeadRouter {
 
 //RegisterRoutes is a routers map of lead requests
 func (r *LeadRouter) RegisterRoutes() {
-	r.router.GET("/lead/:lead_id/address", r.ctrl.handleGetLeadAddress)
-	r.router.POST("/lead/:lead_id/sale", r.ctrl.handleCreateNewSale)
-	r.router.GET("/lead/:lead_id/sale_summary", r.ctrl.handleGetSaleSummary)
+	r.router.GET("/lead/:phone_number/", r.ctrl.handleGetLeadByPhoneNumber)
 }
