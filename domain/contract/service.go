@@ -36,6 +36,7 @@ type ProductService interface {
 	CreateProduct(product entity.Product) resterrors.RestErr
 	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
 	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
+	GetProductByProductStockID(productStockID int64) (product entity.Product, restErr resterrors.RestErr)
 }
 
 // SaleService holds a sale service operations

@@ -23,7 +23,7 @@ type Manager interface {
 	CompanyService(svc *Service) contract.CompanyService
 	BusinessService(svc *Service) contract.BusinessService
 	ProductService(svc *Service) contract.ProductService
-	SaleService(svc *Service) contract.SaleService
+	SaleService(svc *Service, productService contract.ProductService) contract.SaleService
 }
 
 type serviceManager struct {
@@ -51,6 +51,6 @@ func (s *serviceManager) ProductService(svc *Service) contract.ProductService {
 	return newProductService(svc)
 }
 
-func (s *serviceManager) SaleService(svc *Service) contract.SaleService {
-	return newSaleService(svc)
+func (s *serviceManager) SaleService(svc *Service, productService contract.ProductService) contract.SaleService {
+	return newSaleService(svc, productService)
 }

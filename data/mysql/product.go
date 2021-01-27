@@ -17,6 +17,27 @@ func newProductRepo(db connection) *productRepo {
 	}
 }
 
+var queryProduct string = `
+	SELECT
+		tp.id,
+		tp.name,
+		tp.cost,
+		tp.price,
+		tp.business_id,
+		gender.id,
+		gender.name,
+		brand.id,
+		brand.name
+
+	FROM 	tab_product 		tp
+
+	INNER JOIN 	tab_gender 		gender
+			ON 		gender.id		= tp.gender_id
+
+	INNER JOIN 	tab_brand 		brand
+		ON 		brand.id		= tp.brand_id
+`
+
 func (s *productRepo) CreateProduct(product entity.Product) (productID int64, restErr resterrors.RestErr) {
 
 	query := `
@@ -34,7 +55,7 @@ func (s *productRepo) CreateProduct(product entity.Product) (productID int64, re
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return productID, resterrors.NewInternalServerError("Database error")
+		return productID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -60,36 +81,17 @@ func (s *productRepo) CreateProduct(product entity.Product) (productID int64, re
 
 func (s *productRepo) GetProducts() (products []entity.Product, restErr resterrors.RestErr) {
 
-	query := `
-		SELECT
-			tp.id,
-			tp.name,
-			tp.cost,
-			tp.price,
-			tp.business_id,
-			gender.id,
-			gender.name,
-			brand.id,
-			brand.name
-
-		FROM 	tab_product 		tp
-
-		INNER JOIN 	tab_gender 		gender
-			ON 		gender.id		= tp.gender_id
-
-		INNER JOIN 	tab_brand 		brand
-			ON 		brand.id		= tp.brand_id
-	`
+	query := queryProduct
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return products, resterrors.NewInternalServerError("Database error")
+		return products, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {
-		return products, resterrors.NewInternalServerError("Database error")
+		return products, mysqlutils.HandleMySQLError(err)
 	}
 
 	var product entity.Product
@@ -116,38 +118,19 @@ func (s *productRepo) GetProducts() (products []entity.Product, restErr resterro
 
 func (s *productRepo) GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr) {
 
-	query := `
-		SELECT
-			tp.id,
-			tp.name,
-			tp.cost,
-			tp.price,
-			tp.business_id,
-			gender.id,
-			gender.name,
-			brand.id,
-			brand.name
-
-		FROM 	tab_product 		tp
-
-		INNER JOIN 	tab_gender 		gender
-			ON 		gender.id		= tp.gender_id
-
-		INNER JOIN 	tab_brand 		brand
-			ON 		brand.id		= tp.brand_id
-
+	query := queryProduct + `
 		WHERE  	tp.id 			= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return product, resterrors.NewInternalServerError("Database error")
+		return product, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(productID)
 	if err != nil {
-		return product, resterrors.NewInternalServerError("Database error")
+		return product, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(
@@ -168,7 +151,35 @@ func (s *productRepo) GetProductByID(productID int64) (product entity.Product, r
 	return product, nil
 }
 
-func (s *productRepo) GetStockProductByID(productID int64) (productsStock []entity.ProductStock, restErr resterrors.RestErr) {
+func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (productID int64, restErr resterrors.RestErr) {
+
+	query := `
+		SELECT 	tps.product_id 
+		FROM 	tab_product_stock 	tps
+		WHERE 	tps.id 				= ?
+	`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return productID, mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(
+		producStockID,
+	)
+
+	err = row.Scan(
+		&productID,
+	)
+	if err != nil {
+		return productID, mysqlutils.HandleMySQLError(err)
+	}
+
+	return productID, nil
+}
+
+func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock []entity.ProductStock, restErr resterrors.RestErr) {
 
 	query := `
 		SELECT
@@ -184,18 +195,18 @@ func (s *productRepo) GetStockProductByID(productID int64) (productsStock []enti
 			ON 		color.id		= tps.color_id
 
 
-		WHERE  	tps.id 			= ?
+		WHERE  	tps.product_id 			= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return productsStock, resterrors.NewInternalServerError("Database error")
+		return productsStock, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(productID)
 	if err != nil {
-		return productsStock, resterrors.NewInternalServerError("Database error")
+		return productsStock, mysqlutils.HandleMySQLError(err)
 	}
 
 	var productStock entity.ProductStock
@@ -231,7 +242,7 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return resterrors.NewInternalServerError("Database error")
+		return mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -260,7 +271,7 @@ func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr rest
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return brandID, resterrors.NewInternalServerError("Database error")
+		return brandID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -292,13 +303,13 @@ func (s *productRepo) GetBrandByName(brandName string) (brandID int64, restErr r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return brandID, resterrors.NewInternalServerError("Database error")
+		return brandID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(brandName)
 	if err != nil {
-		return brandID, resterrors.NewInternalServerError("Database error")
+		return brandID, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(
@@ -323,7 +334,7 @@ func (s *productRepo) CreateColor(colorName string) (colorID int64, restErr rest
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return colorID, resterrors.NewInternalServerError("Database error")
+		return colorID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -355,13 +366,13 @@ func (s *productRepo) GetColorByName(colorName string) (colorID int64, restErr r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return colorID, resterrors.NewInternalServerError("Database error")
+		return colorID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(colorName)
 	if err != nil {
-		return colorID, resterrors.NewInternalServerError("Database error")
+		return colorID, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(
@@ -386,7 +397,7 @@ func (s *productRepo) CreateGender(genderName string) (genderID int64, restErr r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return genderID, resterrors.NewInternalServerError("Database error")
+		return genderID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -418,13 +429,13 @@ func (s *productRepo) GetGenderByName(genderName string) (genderID int64, restEr
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return genderID, resterrors.NewInternalServerError("Database error")
+		return genderID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(genderName)
 	if err != nil {
-		return genderID, resterrors.NewInternalServerError("Database error")
+		return genderID, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(

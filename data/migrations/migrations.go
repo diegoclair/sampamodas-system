@@ -159,7 +159,7 @@ var (
 					id INT NOT NULL AUTO_INCREMENT,
 					lead_id INT NOT NULL,
 					total_price DECIMAL(7,2) NOT NULL DEFAULT 0.00,
-					freight DECIMAL(7,2) GENERATED ALWAYS AS (0.00) VIRTUAL,
+					freight DECIMAL(7,2) NOT NULL DEFAULT 0.00,
 					payment_method_id INT NOT NULL,
 					send_method_id INT NOT NULL,
 					PRIMARY KEY (id),
@@ -283,6 +283,30 @@ var (
 						ON DELETE NO ACTION
 						ON UPDATE NO ACTION)
 				ENGINE=InnoDB CHARACTER SET=utf8;
+			`,
+		},
+		{
+			Version:     14,
+			Description: "Insert data into tab_payment_method",
+			Script: `
+				INSERT INTO tab_payment_method 
+					(id, name) VALUES
+					(1, "Cartão de Débito"),
+					(2, "Cartão de Crédito"),
+					(3, "PIX/Transferência"),
+					(4, "Dinheiro");
+			`,
+		},
+		{
+			Version:     15,
+			Description: "Insert data into tab_send_method",
+			Script: `
+				INSERT INTO tab_send_method 
+					(id, name) VALUES
+					(1, "Correios"),
+					(2, "Em mãos"),
+					(3, "Motoboy"),
+					(4, "Loggi");
 			`,
 		},
 	}

@@ -31,7 +31,7 @@ func (s *companyRepo) CreateCompany(company entity.Company) resterrors.RestErr {
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return resterrors.NewInternalServerError("Database error")
+		return mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -61,13 +61,13 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, restErr rester
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return companies, resterrors.NewInternalServerError("Database error")
+		return companies, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {
-		return companies, resterrors.NewInternalServerError("Database error")
+		return companies, mysqlutils.HandleMySQLError(err)
 	}
 
 	var company entity.Company
@@ -102,13 +102,13 @@ func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return company, resterrors.NewInternalServerError("Database error")
+		return company, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(companyID)
 	if err != nil {
-		return company, resterrors.NewInternalServerError("Database error")
+		return company, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(

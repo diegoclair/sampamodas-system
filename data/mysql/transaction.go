@@ -49,22 +49,27 @@ func (t *TxManager) GetDBTransaction() *sql.Tx {
 	return t.tx
 }
 
-//Business returns the company set
+//Business returns the business transaction set
 func (t *TxManager) Business() contract.BusinessRepo {
 	return newBusinessRepo(t.tx)
 }
 
-//Company returns the company set
+//Company returns the company transaction set
 func (t *TxManager) Company() contract.CompanyRepo {
 	return newCompanyRepo(t.tx)
 }
 
-//Lead returns the company set
+//Lead returns the lead transaction set
 func (t *TxManager) Lead() contract.LeadRepo {
 	return newLeadRepo(t.tx)
 }
 
-//Product returns the company set
+//Product returns the product transaction set
 func (t *TxManager) Product() contract.ProductRepo {
 	return newProductRepo(t.tx)
+}
+
+//Sale returns the sale transaction set
+func (t *TxManager) Sale() contract.SaleRepo {
+	return newSaleRepo(t.tx)
 }

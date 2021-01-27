@@ -32,7 +32,7 @@ func InitServer(svc *service.Service) *echo.Echo {
 	companyService := svm.CompanyService(svc)
 	leadService := svm.LeadService(svc)
 	productService := svm.ProductService(svc)
-	saleService := svm.SaleService(svc)
+	saleService := svm.SaleService(svc, productService)
 
 	srv.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 

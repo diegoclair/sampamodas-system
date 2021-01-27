@@ -11,6 +11,7 @@ type RepoManager interface {
 	Company() CompanyRepo
 	Lead() LeadRepo
 	Product() ProductRepo
+	Sale() SaleRepo
 }
 
 // BusinessRepo defines the data set for business repo
@@ -41,9 +42,10 @@ type ProductRepo interface {
 	CreateProduct(product entity.Product) (productID int64, restErr resterrors.RestErr)
 	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
 	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
+	GetProductIDByProductStockID(producStockID int64) (productID int64, restErr resterrors.RestErr)
 
 	CreateProductStock(productID int64, product entity.ProductStock) resterrors.RestErr
-	GetStockProductByID(productID int64) (product []entity.ProductStock, restErr resterrors.RestErr)
+	GetStockProductByProductID(productID int64) (product []entity.ProductStock, restErr resterrors.RestErr)
 
 	CreateBrand(brandName string) (brandID int64, restErr resterrors.RestErr)
 	GetBrandByName(brandName string) (brandID int64, restErr resterrors.RestErr)
@@ -53,4 +55,11 @@ type ProductRepo interface {
 
 	CreateGender(genderName string) (genderID int64, restErr resterrors.RestErr)
 	GetGenderByName(genderName string) (genderID int64, restErr resterrors.RestErr)
+}
+
+// SaleRepo defines the data set for sale
+type SaleRepo interface {
+	CreateSale(sale entity.Sale) (saleID int64, restErr resterrors.RestErr)
+	CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.RestErr
+	UpdateSaleTotalPrice(saleID int64, totalPrice float64) resterrors.RestErr
 }

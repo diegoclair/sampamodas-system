@@ -13,9 +13,9 @@ type Sale struct {
 
 //SaleProduct entity
 type SaleProduct struct {
-	ID        int64   `json:"id,omitempty"`
-	SaleID    int64   `json:"sale_id,omitempty"`
-	ProductID int64   `json:"product_id,omitempty"`
-	Quantity  int64   `json:"quantity,omitempty"`
-	Price     float64 `json:"price,omitempty"`
+	ID             int64   `json:"id,omitempty"`
+	SaleID         int64   `json:"sale_id,omitempty"`
+	ProductStockID int64   `json:"product_stock_id,omitempty"`
+	Quantity       int64   `json:"quantity,omitempty"`
+	Price          float64 `json:"price,omitempty"`
 }
