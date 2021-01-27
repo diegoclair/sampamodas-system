@@ -75,7 +75,7 @@ func Instance() (contract.DataManager, error) {
 	return instance, nil
 }
 
-// Begin starts a transaction
+// Begin starts a database transaction
 func (c *DBManager) Begin() (contract.TransactionManager, error) {
 	tx, err := c.db.Begin()
 	if err != nil {
@@ -90,7 +90,7 @@ func (c *DBManager) Close() (err error) {
 	return c.db.Close()
 }
 
-//Business returns the company set
+//Business returns the business set
 func (c *DBManager) Business() contract.BusinessRepo {
 	return newBusinessRepo(c.db)
 }
@@ -100,12 +100,17 @@ func (c *DBManager) Company() contract.CompanyRepo {
 	return newCompanyRepo(c.db)
 }
 
-//Lead returns the company set
+//Lead returns the lead set
 func (c *DBManager) Lead() contract.LeadRepo {
 	return newLeadRepo(c.db)
 }
 
-//Product returns the company set
+//Product returns the product set
 func (c *DBManager) Product() contract.ProductRepo {
 	return newProductRepo(c.db)
+}
+
+//Sale returns the sale set
+func (c *DBManager) Sale() contract.SaleRepo {
+	return newSaleRepo(c.db)
 }

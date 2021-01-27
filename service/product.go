@@ -1,8 +1,6 @@
 package service
 
 import (
-	"regexp"
-
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain"
@@ -26,12 +24,14 @@ func (s *productService) GetProducts() (products []entity.Product, err resterror
 
 	products, err = s.svc.db.Product().GetProducts()
 	if err != nil {
+		logger.Error("productService.GetProducts.GetProducts", err)
 		return products, err
 	}
 
 	for i := range products {
-		products[i].ProductStock, err = s.svc.db.Product().GetStockProductByID(products[i].ID)
+		products[i].ProductStock, err = s.svc.db.Product().GetStockProductByProductID(products[i].ID)
 		if err != nil {
+			logger.Error("productService.GetProducts.GetStockProductByProductID", err)
 			return products, err
 		}
 	}
@@ -40,12 +40,39 @@ func (s *productService) GetProducts() (products []entity.Product, err resterror
 }
 
 func (s *productService) GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr) {
-	return s.svc.db.Product().GetProductByID(productID)
+
+	product, restErr = s.svc.db.Product().GetProductByID(productID)
+	if restErr != nil {
+		logger.Error("productService.GetProductByID.GetProductByID", restErr)
+		return product, restErr
+	}
+	return product, nil
+}
+
+func (s *productService) GetProductByProductStockID(productStockID int64) (product entity.Product, restErr resterrors.RestErr) {
+
+	productID, restErr := s.svc.db.Product().GetProductIDByProductStockID(productStockID)
+	if restErr != nil {
+		logger.Error("productService.GetProductByProductStockID.GetProductIDByProductStockID", restErr)
+		return product, restErr
+	}
+
+	product, restErr = s.svc.db.Product().GetProductByID(productID)
+	if restErr != nil {
+		logger.Error("productService.GetProductByProductStockID.GetProductByID", restErr)
+		return product, restErr
+	}
+
+	product.ProductStock, restErr = s.svc.db.Product().GetStockProductByProductID(productID)
+	if restErr != nil {
+		logger.Error("productService.GetProducts.GetStockProductByProductID", restErr)
+		return product, restErr
+	}
+
+	return
 }
 
 func (s *productService) CreateProduct(product entity.Product) (err resterrors.RestErr) {
-
-	format.FirstLetterUpperCase(&product.Name)
 
 	product.Brand.ID, err = s.getBrandIDByName(product.Brand.Name)
 	if err != nil {
@@ -59,10 +86,12 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 
 	tx, txErr := s.svc.db.Begin()
 	if txErr != nil {
-		logger.Error("productService.CreateProduct.Begin: ", err)
-		return resterrors.NewInternalServerError("Database trasaction error")
+		logger.Error("productService.CreateProduct.Begin: ", txErr)
+		return resterrors.NewInternalServerError("Database transaction error")
 	}
 	defer tx.Rollback()
+
+	format.FirstLetterUpperCase(&product.Name)
 
 	product.ID, err = tx.Product().CreateProduct(product)
 	if err != nil {
@@ -89,20 +118,18 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 	txErr = tx.Commit()
 	if txErr != nil {
 		logger.Error("productService.CreateProduct.Commit: ", txErr)
-		return resterrors.NewInternalServerError("Database trasaction error")
+		return resterrors.NewInternalServerError("Database transaction commit error")
 	}
 
 	return nil
 }
-
-var noSQLRowsRE = regexp.MustCompile(domain.NoSQLRows)
 
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {
 
 	format.FirstLetterUpperCase(&brandName)
 	brandID, err = s.svc.db.Product().GetBrandByName(brandName)
 	if err != nil {
-		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
+		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
 		if len(noRowsIdx) > 0 {
 			logger.Error("getColorIDByName.GetBrandByName: ", err)
 			return brandID, err
@@ -127,7 +154,7 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 	format.FirstLetterUpperCase(&colorName)
 	colorID, err = s.svc.db.Product().GetColorByName(colorName)
 	if err != nil {
-		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
+		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
 		if len(noRowsIdx) > 0 {
 			logger.Error("getColorIDByName.GetColorByName: ", err)
 			return colorID, err
@@ -152,7 +179,7 @@ func (s *productService) getGenderIDByName(genderName string) (genderID int64, e
 	format.FirstLetterUpperCase(&genderName)
 	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
 	if err != nil {
-		noRowsIdx := noSQLRowsRE.FindStringIndex(err.Error())
+		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
 		if len(noRowsIdx) > 0 {
 			logger.Error("getColorIDByName.GetGenderByName: ", err)
 			return genderID, err

@@ -30,7 +30,7 @@ func (s *businessRepo) CreateBusiness(business entity.Business) resterrors.RestE
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return resterrors.NewInternalServerError("Database error")
+		return mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -58,13 +58,13 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, restErr re
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return businesses, resterrors.NewInternalServerError("Database error")
+		return businesses, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
 	if err != nil {
-		return businesses, resterrors.NewInternalServerError("Database error")
+		return businesses, mysqlutils.HandleMySQLError(err)
 	}
 
 	var business entity.Business
@@ -97,13 +97,13 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return business, resterrors.NewInternalServerError("Database error")
+		return business, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	result := stmt.QueryRow(businessID)
 	if err != nil {
-		return business, resterrors.NewInternalServerError("Database error")
+		return business, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(
@@ -132,13 +132,13 @@ func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []e
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return businesses, resterrors.NewInternalServerError("Database error")
+		return businesses, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(companyID)
 	if err != nil {
-		return businesses, resterrors.NewInternalServerError("Database error")
+		return businesses, mysqlutils.HandleMySQLError(err)
 	}
 
 	var business entity.Business

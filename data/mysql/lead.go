@@ -10,7 +10,6 @@ type leadRepo struct {
 	db connection
 }
 
-// newLeadRepo returns a instance of dbrepo
 func newLeadRepo(db connection) *leadRepo {
 	return &leadRepo{
 		db: db,
@@ -32,13 +31,13 @@ func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, r
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return lead, resterrors.NewInternalServerError("Database error")
+		return lead, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	row := stmt.QueryRow(phoneNumber)
 	if err != nil {
-		return lead, resterrors.NewInternalServerError("Database error")
+		return lead, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = row.Scan(
@@ -76,13 +75,13 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return addresses, resterrors.NewInternalServerError("Database error")
+		return addresses, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query(leadID)
 	if err != nil {
-		return addresses, resterrors.NewInternalServerError("Database error")
+		return addresses, mysqlutils.HandleMySQLError(err)
 	}
 
 	var address entity.LeadAddress
@@ -123,7 +122,7 @@ func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, restErr resterror
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return leadID, resterrors.NewInternalServerError("Database error")
+		return leadID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
@@ -165,7 +164,7 @@ func (s *leadRepo) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return resterrors.NewInternalServerError("Database error")
+		return mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
