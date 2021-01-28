@@ -6,8 +6,8 @@ type Product struct {
 	Name         string         `json:"name,omitempty"`
 	Cost         float64        `json:"cost,omitempty"`
 	Price        float64        `json:"price,omitempty"`
-	BrandName    string         `json:"brand_name,omitempty" mapper:"-"`
-	GenderName   string         `json:"gender_name,omitempty" mapper:"-"`
+	BrandName    string         `json:"brand_name,omitempty" mapper:"Brand.Name"`
+	GenderName   string         `json:"gender_name,omitempty" mapper:"Gender.Name"`
 	BusinessID   int64          `json:"business_id,omitempty"`
 	ProductStock []ProductStock `json:"product_stock,omitempty"`
 }
