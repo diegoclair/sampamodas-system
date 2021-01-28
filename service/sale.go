@@ -51,7 +51,7 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr rester
 			return saleID, restErr
 		}
 
-		restErr = s.removeProductStock(sale.SaleProduct[i].ProductStockID, sale.SaleProduct[i].Quantity, tx)
+		restErr = s.removeStockAvailableQuantity(sale.SaleProduct[i].ProductStockID, sale.SaleProduct[i].Quantity, tx)
 		if restErr != nil {
 			return saleID, restErr
 		}
@@ -82,11 +82,11 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr rester
 	return saleID, nil
 }
 
-func (s *saleService) removeProductStock(productStockID, quantity int64, tx contract.TransactionManager) resterrors.RestErr {
+func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int64, tx contract.TransactionManager) resterrors.RestErr {
 
 	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
 	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
-		logger.Error("saleService.removeProductStock.GetAvailableQuantityByProductStockID: ", restErr)
+		logger.Error("saleService.removeStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
 		return restErr
 	}
 
@@ -98,7 +98,7 @@ func (s *saleService) removeProductStock(productStockID, quantity int64, tx cont
 
 	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
 	if restErr != nil {
-		logger.Error("saleService.removeProductStock.UpdateAvailableQuantityByProductStockID: ", restErr)
+		logger.Error("saleService.removeStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", restErr)
 		return restErr
 	}
 

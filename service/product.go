@@ -114,10 +114,16 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 			return err
 		}
 
-		err = s.addProductStock(productStockID, product.ProductStock[i].InputQuantity, tx)
+		err = s.registerStockInput(productStockID, product.ProductStock[i].InputQuantity, tx)
 		if err != nil {
 			return err
 		}
+
+		err = s.addStockAvailableQuantity(productStockID, product.ProductStock[i].InputQuantity, tx)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	txErr = tx.Commit()
@@ -129,11 +135,11 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 	return nil
 }
 
-func (s *productService) addProductStock(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
+func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
 
 	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
 	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
-		logger.Error("productService.addProductStock.GetAvailableQuantityByProductStockID: ", restErr)
+		logger.Error("productService.addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
 		return restErr
 	}
 
@@ -141,7 +147,18 @@ func (s *productService) addProductStock(productStockID, quantity int64, tx cont
 
 	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
 	if restErr != nil {
-		logger.Error("productService.addProductStock.UpdateAvailableQuantityByProductStockID: ", restErr)
+		logger.Error("productService.addStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", restErr)
+		return restErr
+	}
+
+	return nil
+}
+
+func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
+
+	restErr = tx.Product().RegisterStockInput(productStockID, quantity)
+	if restErr != nil {
+		logger.Error("productService.registerStockInput.RegisterStockInput: ", restErr)
 		return restErr
 	}
 

@@ -179,6 +179,33 @@ func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (product
 	return productID, nil
 }
 
+func (s *productRepo) RegisterStockInput(productStockID, quantity int64) resterrors.RestErr {
+	query := `
+		INSERT INTO tab_stock_input (
+			product_stock_id,
+			quantity
+		) 
+		VALUES	
+			(?, ?);
+		`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		productStockID,
+		quantity,
+	)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+
+	return nil
+}
+
 func (s *productRepo) GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, restErr resterrors.RestErr) {
 
 	query := `

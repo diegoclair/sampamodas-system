@@ -43,6 +43,7 @@ type ProductRepo interface {
 	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
 	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
 	GetProductIDByProductStockID(producStockID int64) (productID int64, restErr resterrors.RestErr)
+	RegisterStockInput(productStockID, quantity int64) resterrors.RestErr
 
 	GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, restErr resterrors.RestErr)
 	UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) resterrors.RestErr
