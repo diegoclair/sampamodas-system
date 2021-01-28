@@ -1,6 +1,8 @@
 package service
 
 import (
+	"fmt"
+
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
@@ -49,6 +51,10 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr rester
 			return saleID, restErr
 		}
 
+		restErr = s.removeProductStock(sale.SaleProduct[i].ProductStockID, sale.SaleProduct[i].Quantity, tx)
+		if restErr != nil {
+			return saleID, restErr
+		}
 		sale.SaleProduct[i].Price = product.Price
 		sale.SaleProduct[i].SaleID = saleID
 
@@ -74,6 +80,29 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr rester
 	}
 
 	return saleID, nil
+}
+
+func (s *saleService) removeProductStock(productStockID, quantity int64, tx contract.TransactionManager) resterrors.RestErr {
+
+	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
+	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
+		logger.Error("saleService.removeProductStock.GetAvailableQuantityByProductStockID: ", restErr)
+		return restErr
+	}
+
+	if quantity > actualAvailableQuantity {
+		logger.Error(fmt.Sprintf("The sale quantity is bigger than the stock quantity: saleQuantity: %v - availableQuantity: %v", quantity, actualAvailableQuantity), nil)
+		return resterrors.NewBadRequestError("A quantidade de venda do produto não pode ser superior à quantidade disponível no estoque.")
+	}
+	availableQuantity := actualAvailableQuantity - quantity
+
+	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
+	if restErr != nil {
+		logger.Error("saleService.removeProductStock.UpdateAvailableQuantityByProductStockID: ", restErr)
+		return restErr
+	}
+
+	return nil
 }
 
 func (s *saleService) CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.RestErr {

@@ -108,14 +108,14 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 			return err
 		}
 
-		product.ProductStock[i].AvailableQuantity, err = s.addProductStock(product.ProductStock[i].ID, product.ProductStock[i].InputQuantity)
+		productStockID, err := tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
 		if err != nil {
+			logger.Error("productService.CreateProduct.CreateProductStock: ", err)
 			return err
 		}
 
-		err = tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
+		err = s.addProductStock(productStockID, product.ProductStock[i].InputQuantity, tx)
 		if err != nil {
-			logger.Error("productService.CreateProduct.CreateProductStock: ", err)
 			return err
 		}
 	}
@@ -129,23 +129,23 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 	return nil
 }
 
-func (s *productService) addProductStock(productStockID, quantity int64) (availableQuantity int64, restErr resterrors.RestErr) {
+func (s *productService) addProductStock(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
 
 	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
-	if restErr != nil {
+	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
 		logger.Error("productService.addProductStock.GetAvailableQuantityByProductStockID: ", restErr)
-		return availableQuantity, restErr
+		return restErr
 	}
 
-	availableQuantity = actualAvailableQuantity + quantity
+	availableQuantity := actualAvailableQuantity + quantity
 
-	restErr = s.svc.db.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
+	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
 	if restErr != nil {
 		logger.Error("productService.addProductStock.UpdateAvailableQuantityByProductStockID: ", restErr)
-		return availableQuantity, restErr
+		return restErr
 	}
 
-	return availableQuantity, nil
+	return nil
 }
 
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {

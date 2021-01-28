@@ -278,7 +278,7 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 	return productsStock, nil
 }
 
-func (s *productRepo) CreateProductStock(productID int64, productStock entity.ProductStock) resterrors.RestErr {
+func (s *productRepo) CreateProductStock(productID int64, productStock entity.ProductStock) (producStockID int64, restErr resterrors.RestErr) {
 
 	query := `
 		INSERT INTO tab_product_stock (
@@ -292,20 +292,25 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return mysqlutils.HandleMySQLError(err)
+		return producStockID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(
+	result, err := stmt.Exec(
 		productID,
 		productStock.Color.ID,
 		productStock.Size,
 	)
 	if err != nil {
-		return mysqlutils.HandleMySQLError(err)
+		return producStockID, mysqlutils.HandleMySQLError(err)
 	}
 
-	return nil
+	producStockID, err = result.LastInsertId()
+	if err != nil {
+		return producStockID, mysqlutils.HandleMySQLError(err)
+	}
+
+	return producStockID, nil
 }
 
 func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr resterrors.RestErr) {
