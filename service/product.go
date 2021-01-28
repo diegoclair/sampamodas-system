@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/domain"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/infra/errors"
 	"github.com/diegoclair/sampamodas-system/backend/infra/format"
 )
 
@@ -108,6 +108,11 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 			return err
 		}
 
+		product.ProductStock[i].AvailableQuantity, err = s.addProductStock(product.ProductStock[i].ID, product.ProductStock[i].InputQuantity)
+		if err != nil {
+			return err
+		}
+
 		err = tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
 		if err != nil {
 			logger.Error("productService.CreateProduct.CreateProductStock: ", err)
@@ -124,16 +129,32 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 	return nil
 }
 
+func (s *productService) addProductStock(productStockID, quantity int64) (availableQuantity int64, restErr resterrors.RestErr) {
+
+	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
+	if restErr != nil {
+		logger.Error("productService.addProductStock.GetAvailableQuantityByProductStockID: ", restErr)
+		return availableQuantity, restErr
+	}
+
+	availableQuantity = actualAvailableQuantity + quantity
+
+	restErr = s.svc.db.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
+	if restErr != nil {
+		logger.Error("productService.addProductStock.UpdateAvailableQuantityByProductStockID: ", restErr)
+		return availableQuantity, restErr
+	}
+
+	return availableQuantity, nil
+}
+
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {
 
 	format.FirstLetterUpperCase(&brandName)
 	brandID, err = s.svc.db.Product().GetBrandByName(brandName)
-	if err != nil {
-		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
-		if len(noRowsIdx) > 0 {
-			logger.Error("getColorIDByName.GetBrandByName: ", err)
-			return brandID, err
-		}
+	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+		logger.Error("getColorIDByName.GetBrandByName: ", err)
+		return brandID, err
 	}
 
 	if brandID > 0 {
@@ -153,12 +174,9 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 
 	format.FirstLetterUpperCase(&colorName)
 	colorID, err = s.svc.db.Product().GetColorByName(colorName)
-	if err != nil {
-		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
-		if len(noRowsIdx) > 0 {
-			logger.Error("getColorIDByName.GetColorByName: ", err)
-			return colorID, err
-		}
+	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+		logger.Error("getColorIDByName.GetColorByName: ", err)
+		return colorID, err
 	}
 
 	if colorID > 0 {
@@ -178,12 +196,9 @@ func (s *productService) getGenderIDByName(genderName string) (genderID int64, e
 
 	format.FirstLetterUpperCase(&genderName)
 	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
-	if err != nil {
-		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
-		if len(noRowsIdx) > 0 {
-			logger.Error("getColorIDByName.GetGenderByName: ", err)
-			return genderID, err
-		}
+	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+		logger.Error("getColorIDByName.GetGenderByName: ", err)
+		return genderID, err
 	}
 
 	if genderID > 0 {

@@ -26,10 +26,11 @@ type Gender struct {
 
 // ProductStock entity
 type ProductStock struct {
-	ID       int64
-	Color    Color
-	Size     string
-	Quantity int64
+	ID                int64
+	Color             Color
+	Size              string
+	AvailableQuantity int64
+	InputQuantity     int64
 }
 
 // Color entity

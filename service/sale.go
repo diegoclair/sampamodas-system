@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/domain"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/infra/errors"
 )
 
 type saleService struct {
@@ -39,12 +39,12 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr rester
 	for i := range sale.SaleProduct {
 
 		product, restErr := s.productService.GetProductByProductStockID(sale.SaleProduct[i].ProductStockID)
+		if restErr != nil && errors.SQLResultIsEmpty(restErr.Message()) {
+			logger.Error("ProductStockID is invalid", restErr)
+			return saleID, resterrors.NewBadRequestError("O ID do estoque do produto é inválido, contate o administrador.")
+
+		}
 		if restErr != nil {
-			noRecorsIdx := domain.NoRecordsFindRE.FindStringIndex(restErr.Error())
-			if len(noRecorsIdx) > 0 {
-				logger.Error("ProductStockID is invalid", restErr)
-				return saleID, resterrors.NewBadRequestError("O ID do estoque do produto é inválido, contate o administrador.")
-			}
 			logger.Error("saleService.CreateSale.GetProductByProductStockID", restErr)
 			return saleID, restErr
 		}

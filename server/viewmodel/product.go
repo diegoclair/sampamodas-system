@@ -14,10 +14,11 @@ type Product struct {
 
 // ProductStock viewmodel
 type ProductStock struct {
-	ID       int64  `json:"id,omitempty"`
-	Color    string `json:"color,omitempty"`
-	Size     string `json:"size,omitempty"`
-	Quantity int64  `json:"quantity,omitempty"`
+	ID                int64  `json:"id,omitempty"`
+	Color             string `json:"color,omitempty"`
+	Size              string `json:"size,omitempty"`
+	AvailableQuantity string `json:"available_quantity,omitempty"`
+	Quantity          int64  `json:"quantity,omitempty" mapper:"InputQuantity"`
 }
 
 // Brand viewmodel

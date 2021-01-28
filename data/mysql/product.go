@@ -32,7 +32,7 @@ var queryProduct string = `
 	FROM 	tab_product 		tp
 
 	INNER JOIN 	tab_gender 		tg
-			ON 		tg.gender_id		= tp.gender_id
+		ON 		tg.gender_id		= tp.gender_id
 
 	INNER JOIN 	tab_brand 		tb
 		ON 		tb.brand_id		= tp.brand_id
@@ -179,6 +179,57 @@ func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (product
 	return productID, nil
 }
 
+func (s *productRepo) GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, restErr resterrors.RestErr) {
+
+	query := `
+		SELECT
+			tps.available_quantity
+
+		FROM 	tab_product_stock	tps
+
+		WHERE  	tps.product_stock_id 		= ?
+	`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return availableQuantity, mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(productStockID)
+	err = row.Scan(
+		&availableQuantity,
+	)
+	if err != nil {
+		return availableQuantity, mysqlutils.HandleMySQLError(err)
+	}
+
+	return availableQuantity, nil
+}
+
+func (s *productRepo) UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) resterrors.RestErr {
+
+	query := `
+		UPDATE 	tab_product_stock
+		
+		SET 	available_quantity = ?
+
+		WHERE  	product_stock_id 	= ?
+	`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(quantity, productStockID)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+	return nil
+}
+
 func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock []entity.ProductStock, restErr resterrors.RestErr) {
 
 	query := `
@@ -187,7 +238,7 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 			tc.color_id,
 			tc.name,
 			tps.size,
-			tps.quantity
+			tps.available_quantity
 
 		FROM 	tab_product_stock	tps
 
@@ -216,7 +267,7 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 			&productStock.Color.ID,
 			&productStock.Color.Name,
 			&productStock.Size,
-			&productStock.Quantity,
+			&productStock.AvailableQuantity,
 		)
 		if err != nil {
 			return nil, mysqlutils.HandleMySQLError(err)
@@ -233,11 +284,10 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 		INSERT INTO tab_product_stock (
 			product_id,
 			color_id,
-			size,
-			quantity
+			size
 		) 
 		VALUES	
-			(?, ?, ?, ?);
+			(?, ?, ?);
 		`
 
 	stmt, err := s.db.Prepare(query)
@@ -250,7 +300,6 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 		productID,
 		productStock.Color.ID,
 		productStock.Size,
-		productStock.Quantity,
 	)
 	if err != nil {
 		return mysqlutils.HandleMySQLError(err)

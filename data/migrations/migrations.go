@@ -212,7 +212,7 @@ var (
 					product_id INT NOT NULL,
 					color_id INT NOT NULL,
 					size VARCHAR(45) NOT NULL,
-					balance INT NOT NULL,
+					available_quantity INT NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (product_stock_id),
