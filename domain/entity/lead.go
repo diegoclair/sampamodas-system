@@ -2,7 +2,7 @@ package entity
 
 // Lead entity
 type Lead struct {
-	ID          int64         `json:"id,omitempty"`
+	LeadID      int64         `json:"lead_id,omitempty"`
 	Name        string        `json:"name,omitempty"`
 	Email       string        `json:"email,omitempty"`
 	PhoneNumber string        `json:"phone_number,omitempty"`
@@ -12,7 +12,7 @@ type Lead struct {
 
 // LeadAddress entity
 type LeadAddress struct {
-	ID             int64  `json:"id,omitempty"`
+	LeadAddressID  int64  `json:"lead_address_id,omitempty"`
 	LeadID         int64  `json:"lead_id,omitempty"`
 	AddressType    string `json:"address_type,omitempty"`
 	Street         string `json:"street,omitempty"`

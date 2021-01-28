@@ -2,7 +2,7 @@ package entity
 
 // Product entity
 type Product struct {
-	ID           int64          `json:"id,omitempty"`
+	ProductID    int64          `json:"product_id,omitempty"`
 	Name         string         `json:"name,omitempty"`
 	Cost         float64        `json:"cost,omitempty"`
 	Price        float64        `json:"price,omitempty"`
@@ -14,26 +14,26 @@ type Product struct {
 
 // Brand entity
 type Brand struct {
-	ID   int64  `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
+	BrandID int64  `json:"brand_id,omitempty"`
+	Name    string `json:"name,omitempty"`
 }
 
 // Gender entity
 type Gender struct {
-	ID   int64  `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
+	GenderID int64  `json:"gender_id,omitempty"`
+	Name     string `json:"name,omitempty"`
 }
 
 // ProductStock entity
 type ProductStock struct {
-	ID       int64  `json:"id,omitempty"`
-	Color    Color  `json:"color,omitempty"`
-	Size     string `json:"size,omitempty"`
-	Quantity int64  `json:"quantity,omitempty"`
+	ProductStockID int64  `json:"product_stock_id,omitempty"`
+	Color          Color  `json:"color,omitempty"`
+	Size           string `json:"size,omitempty"`
+	Quantity       int64  `json:"quantity,omitempty"`
 }
 
 // Color entity
 type Color struct {
-	ID   int64  `json:"id,omitempty"`
-	Name string `json:"name,omitempty"`
+	ColorID int64  `json:"color_id,omitempty"`
+	Name    string `json:"name,omitempty"`
 }
