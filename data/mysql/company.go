@@ -51,7 +51,7 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, restErr rester
 
 	query := `
 		SELECT
-			tc.id,
+			tc.company_id,
 			tc.document_number,
 			tc.legal_name,
 			tc.commercial_name
@@ -91,13 +91,13 @@ func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, r
 
 	query := `
 		SELECT
-			tc.id,
+			tc.company_id,
 			tc.document_number,
 			tc.legal_name,
 			tc.commercial_name
 
 		FROM 	tab_company 	tc
-		WHERE  	tc.id 			= ?
+		WHERE  	tc.company_id 	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
