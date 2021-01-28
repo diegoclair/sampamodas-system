@@ -315,7 +315,7 @@ var (
 			Description: "Insert data into tab_payment_method",
 			Script: `
 				INSERT INTO tab_payment_method 
-					(id, name) VALUES
+					(payment_method_id, name) VALUES
 					(1, "Cartão de Débito"),
 					(2, "Cartão de Crédito"),
 					(3, "PIX/Transferência"),
@@ -327,7 +327,7 @@ var (
 			Description: "Insert data into tab_send_method",
 			Script: `
 				INSERT INTO tab_send_method 
-					(id, name) VALUES
+					(send_method_id, name) VALUES
 					(1, "Correios"),
 					(2, "Em mãos"),
 					(3, "Motoboy"),
