@@ -20,7 +20,7 @@ func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, r
 
 	query := `
 		SELECT
-			tl.id,
+			tl.lead_id,
 			tl.name,
 			tl.email,
 			tl.phone_number,
@@ -58,7 +58,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 
 	query := `
 		SELECT
-			tla.id,
+			tla.lead_address_id,
 			tla.lead_id,
 			tla.address_type,
 			tla.street,

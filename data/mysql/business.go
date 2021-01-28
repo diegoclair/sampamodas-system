@@ -49,7 +49,7 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, restErr re
 
 	query := `
 		SELECT
-			tb.id,
+			tb.business_id,
 			tb.company_id,
 			tb.name
 
@@ -87,12 +87,12 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 
 	query := `
 		SELECT
-			tb.id,
+			tb.business_id,
 			tb.company_id,
 			tb.name
 
 		FROM 	tab_business 	tb
-		WHERE  	tb.id 			= ?
+		WHERE  	tb.business_id 	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
@@ -122,12 +122,12 @@ func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []e
 
 	query := `
 		SELECT
-			tb.id,
+			tb.business_id,
 			tb.company_id,
 			tb.name
 
 		FROM 	tab_business	tb
-		WHERE 	company_id		= ?
+		WHERE 	tb.company_id	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)

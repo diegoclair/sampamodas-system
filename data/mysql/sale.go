@@ -95,9 +95,9 @@ func (s *saleRepo) CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.
 func (s *saleRepo) UpdateSaleTotalPrice(saleID int64, totalPrice float64) resterrors.RestErr {
 	query := `
 		UPDATE 	tab_sale
-			SET total_price	= 	?
+		SET 	total_price		= 	?
 
-		WHERE 	id			=	?;
+		WHERE 	sale_id			=	?;
 	`
 
 	stmt, err := s.db.Prepare(query)

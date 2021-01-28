@@ -40,7 +40,7 @@ func NewController(productService contract.ProductService, mapper mapper.Mapper)
 
 func (s *Controller) handleCreateProduct(c echo.Context) error {
 
-	input := viewmodel.CreateProduct{}
+	input := viewmodel.Product{}
 
 	err := c.Bind(&input)
 	if err != nil {

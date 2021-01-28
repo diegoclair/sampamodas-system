@@ -19,23 +19,23 @@ func newProductRepo(db connection) *productRepo {
 
 var queryProduct string = `
 	SELECT
-		tp.id,
+		tp.product_id,
 		tp.name,
 		tp.cost,
 		tp.price,
 		tp.business_id,
-		gender.id,
-		gender.name,
-		brand.id,
-		brand.name
+		tg.gender_id,
+		tg.name,
+		tb.brand_id,
+		tb.name
 
 	FROM 	tab_product 		tp
 
-	INNER JOIN 	tab_gender 		gender
-			ON 		gender.id		= tp.gender_id
+	INNER JOIN 	tab_gender 		tg
+		ON 		tg.gender_id		= tp.gender_id
 
-	INNER JOIN 	tab_brand 		brand
-		ON 		brand.id		= tp.brand_id
+	INNER JOIN 	tab_brand 		tb
+		ON 		tb.brand_id		= tp.brand_id
 `
 
 func (s *productRepo) CreateProduct(product entity.Product) (productID int64, restErr resterrors.RestErr) {
@@ -119,7 +119,7 @@ func (s *productRepo) GetProducts() (products []entity.Product, restErr resterro
 func (s *productRepo) GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr) {
 
 	query := queryProduct + `
-		WHERE  	tp.id 			= ?
+		WHERE  	tp.product_id 			= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
@@ -155,8 +155,8 @@ func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (product
 
 	query := `
 		SELECT 	tps.product_id 
-		FROM 	tab_product_stock 	tps
-		WHERE 	tps.id 				= ?
+		FROM 	tab_product_stock 		tps
+		WHERE 	tps.product_stock_id 	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
@@ -179,20 +179,98 @@ func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (product
 	return productID, nil
 }
 
+func (s *productRepo) RegisterStockInput(productStockID, quantity int64) resterrors.RestErr {
+	query := `
+		INSERT INTO tab_stock_input (
+			product_stock_id,
+			quantity
+		) 
+		VALUES	
+			(?, ?);
+		`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		productStockID,
+		quantity,
+	)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+
+	return nil
+}
+
+func (s *productRepo) GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, restErr resterrors.RestErr) {
+
+	query := `
+		SELECT
+			tps.available_quantity
+
+		FROM 	tab_product_stock	tps
+
+		WHERE  	tps.product_stock_id 		= ?
+	`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return availableQuantity, mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	row := stmt.QueryRow(productStockID)
+	err = row.Scan(
+		&availableQuantity,
+	)
+	if err != nil {
+		return availableQuantity, mysqlutils.HandleMySQLError(err)
+	}
+
+	return availableQuantity, nil
+}
+
+func (s *productRepo) UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) resterrors.RestErr {
+
+	query := `
+		UPDATE 	tab_product_stock
+		
+		SET 	available_quantity = ?
+
+		WHERE  	product_stock_id 	= ?
+	`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(quantity, productStockID)
+	if err != nil {
+		return mysqlutils.HandleMySQLError(err)
+	}
+	return nil
+}
+
 func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock []entity.ProductStock, restErr resterrors.RestErr) {
 
 	query := `
 		SELECT
-			tps.id,
-			color.id,
-			color.name,
+			tps.product_stock_id,
+			tc.color_id,
+			tc.name,
 			tps.size,
-			tps.quantity
+			tps.available_quantity
 
 		FROM 	tab_product_stock	tps
 
-		INNER JOIN 	tab_color 		color
-			ON 		color.id		= tps.color_id
+		INNER JOIN 	tab_color 		tc
+			ON 		tc.color_id		= tps.color_id
 
 
 		WHERE  	tps.product_id 			= ?
@@ -216,7 +294,7 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 			&productStock.Color.ID,
 			&productStock.Color.Name,
 			&productStock.Size,
-			&productStock.Quantity,
+			&productStock.AvailableQuantity,
 		)
 		if err != nil {
 			return nil, mysqlutils.HandleMySQLError(err)
@@ -227,36 +305,39 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 	return productsStock, nil
 }
 
-func (s *productRepo) CreateProductStock(productID int64, productStock entity.ProductStock) resterrors.RestErr {
+func (s *productRepo) CreateProductStock(productID int64, productStock entity.ProductStock) (producStockID int64, restErr resterrors.RestErr) {
 
 	query := `
 		INSERT INTO tab_product_stock (
 			product_id,
 			color_id,
-			size,
-			quantity
+			size
 		) 
 		VALUES	
-			(?, ?, ?, ?);
+			(?, ?, ?);
 		`
 
 	stmt, err := s.db.Prepare(query)
 	if err != nil {
-		return mysqlutils.HandleMySQLError(err)
+		return producStockID, mysqlutils.HandleMySQLError(err)
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(
+	result, err := stmt.Exec(
 		productID,
 		productStock.Color.ID,
 		productStock.Size,
-		productStock.Quantity,
 	)
 	if err != nil {
-		return mysqlutils.HandleMySQLError(err)
+		return producStockID, mysqlutils.HandleMySQLError(err)
 	}
 
-	return nil
+	producStockID, err = result.LastInsertId()
+	if err != nil {
+		return producStockID, mysqlutils.HandleMySQLError(err)
+	}
+
+	return producStockID, nil
 }
 
 func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr resterrors.RestErr) {
@@ -294,7 +375,7 @@ func (s *productRepo) GetBrandByName(brandName string) (brandID int64, restErr r
 
 	query := `
 		SELECT
-			tb.id
+			tb.brand_id
 
 		FROM 	tab_brand 	tb
 
@@ -357,7 +438,7 @@ func (s *productRepo) GetColorByName(colorName string) (colorID int64, restErr r
 
 	query := `
 		SELECT
-			tc.id
+			tc.color_id
 
 		FROM 	tab_color 	tc
 
@@ -420,7 +501,7 @@ func (s *productRepo) GetGenderByName(genderName string) (genderID int64, restEr
 
 	query := `
 		SELECT
-			tg.id
+			tg.gender_id
 
 		FROM 	tab_gender 	tg
 

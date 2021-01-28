@@ -3,9 +3,9 @@ package service
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/domain"
 	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/infra/errors"
 	"github.com/diegoclair/sampamodas-system/backend/infra/format"
 )
 
@@ -108,11 +108,22 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 			return err
 		}
 
-		err = tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
+		productStockID, err := tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
 		if err != nil {
 			logger.Error("productService.CreateProduct.CreateProductStock: ", err)
 			return err
 		}
+
+		err = s.registerStockInput(productStockID, product.ProductStock[i].InputQuantity, tx)
+		if err != nil {
+			return err
+		}
+
+		err = s.addStockAvailableQuantity(productStockID, product.ProductStock[i].InputQuantity, tx)
+		if err != nil {
+			return err
+		}
+
 	}
 
 	txErr = tx.Commit()
@@ -124,16 +135,43 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 	return nil
 }
 
+func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
+
+	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
+	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
+		logger.Error("productService.addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
+		return restErr
+	}
+
+	availableQuantity := actualAvailableQuantity + quantity
+
+	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
+	if restErr != nil {
+		logger.Error("productService.addStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", restErr)
+		return restErr
+	}
+
+	return nil
+}
+
+func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
+
+	restErr = tx.Product().RegisterStockInput(productStockID, quantity)
+	if restErr != nil {
+		logger.Error("productService.registerStockInput.RegisterStockInput: ", restErr)
+		return restErr
+	}
+
+	return nil
+}
+
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {
 
 	format.FirstLetterUpperCase(&brandName)
 	brandID, err = s.svc.db.Product().GetBrandByName(brandName)
-	if err != nil {
-		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
-		if len(noRowsIdx) > 0 {
-			logger.Error("getColorIDByName.GetBrandByName: ", err)
-			return brandID, err
-		}
+	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+		logger.Error("getColorIDByName.GetBrandByName: ", err)
+		return brandID, err
 	}
 
 	if brandID > 0 {
@@ -153,12 +191,9 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 
 	format.FirstLetterUpperCase(&colorName)
 	colorID, err = s.svc.db.Product().GetColorByName(colorName)
-	if err != nil {
-		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
-		if len(noRowsIdx) > 0 {
-			logger.Error("getColorIDByName.GetColorByName: ", err)
-			return colorID, err
-		}
+	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+		logger.Error("getColorIDByName.GetColorByName: ", err)
+		return colorID, err
 	}
 
 	if colorID > 0 {
@@ -178,12 +213,9 @@ func (s *productService) getGenderIDByName(genderName string) (genderID int64, e
 
 	format.FirstLetterUpperCase(&genderName)
 	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
-	if err != nil {
-		noRowsIdx := domain.NoSQLRowsRE.FindStringIndex(err.Message())
-		if len(noRowsIdx) > 0 {
-			logger.Error("getColorIDByName.GetGenderByName: ", err)
-			return genderID, err
-		}
+	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+		logger.Error("getColorIDByName.GetGenderByName: ", err)
+		return genderID, err
 	}
 
 	if genderID > 0 {

@@ -2,7 +2,7 @@ package viewmodel
 
 // Company viewmodel
 type Company struct {
-	ID             int64  `json:"id,omitempty"`
+	CompanyID      int64  `json:"company_id,omitempty"`
 	DocumentNumber string `json:"document_number,omitempty"`
 	CommercialName string `json:"commercial_name,omitempty"`
 	LegalName      string `json:"legal_name,omitempty"`
