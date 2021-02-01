@@ -73,10 +73,36 @@ var (
 		},
 		{
 			Version:     5,
+			Description: "Create tab_supplier",
+			Script: `
+				CREATE TABLE IF NOT EXISTS tab_supplier (
+					supplier_id INT NOT NULL AUTO_INCREMENT,
+					business_id INT NOT NULL,
+					name VARCHAR(45) NULL,
+					email VARCHAR(45) NULL,
+					phone_number VARCHAR(45) NOT NULL,
+					instagram VARCHAR(45) NULL,
+					website VARCHAR(85) NULL,
+					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+					PRIMARY KEY (supplier_id),
+					UNIQUE INDEX supplier_id_UNIQUE (supplier_id ASC) VISIBLE,
+					INDEX fk_tab_supplier_tab_business1_idx (business_id ASC) VISIBLE,
+					CONSTRAINT fk_tab_supplier_tab_business1
+					FOREIGN KEY (business_id)
+					REFERENCES tab_business (business_id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION)
+				ENGINE=InnoDB CHARACTER SET=utf8;
+			`,
+		},
+		{
+			Version:     6,
 			Description: "Create tab_product",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_product (
 					product_id INT NOT NULL AUTO_INCREMENT,
+					supplier_id INT NOT NULL,
 					name VARCHAR(45) NOT NULL,
 					cost DECIMAL(7,2) NULL DEFAULT 0.00,
 					price DECIMAL(7,2) NULL DEFAULT 0.00,
@@ -90,6 +116,7 @@ var (
 					INDEX fk_tab_products_tab_business1_idx (business_id ASC) VISIBLE,
 					INDEX fk_tab_product_tab_brand1_idx (brand_id ASC) VISIBLE,
 					INDEX fk_tab_product_tab_gender1_idx (gender_id ASC) VISIBLE,
+					INDEX fk_tab_product_tab_supplier1_idx (supplier_id ASC) VISIBLE,
 					CONSTRAINT fk_tab_product_tab_business1
 					FOREIGN KEY (business_id)
 					REFERENCES tab_business (business_id)
@@ -104,12 +131,17 @@ var (
 					FOREIGN KEY (gender_id)
 					REFERENCES tab_gender (gender_id)
 					ON DELETE NO ACTION
+					ON UPDATE NO ACTION,
+					CONSTRAINT fk_tab_product_tab_supplier1
+					FOREIGN KEY (supplier_id)
+					REFERENCES tab_supplier (supplier_id)
+					ON DELETE NO ACTION
 					ON UPDATE NO ACTION)
 				ENGINE=InnoDB CHARACTER SET=utf8;
 				`,
 		},
 		{
-			Version:     6,
+			Version:     7,
 			Description: "Create tab_lead",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_lead (
@@ -127,7 +159,7 @@ var (
 			`,
 		},
 		{
-			Version:     7,
+			Version:     8,
 			Description: "Create tab_send_method",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_send_method (
@@ -142,7 +174,7 @@ var (
 			`,
 		},
 		{
-			Version:     8,
+			Version:     9,
 			Description: "Create tab_payment_method",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_payment_method (
@@ -156,7 +188,7 @@ var (
 			`,
 		},
 		{
-			Version:     9,
+			Version:     10,
 			Description: "Create tab_sale",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_sale (
@@ -166,6 +198,8 @@ var (
 					freight DECIMAL(7,2) NOT NULL,
 					payment_method_id INT NOT NULL,
 					send_method_id INT NOT NULL,
+					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (sale_id),
 					INDEX fk_tab_sale_tab_lead1_idx (lead_id ASC) VISIBLE,
 					INDEX fk_tab_sale_tab_send_method1_idx (send_method_id ASC) VISIBLE,
@@ -190,7 +224,7 @@ var (
 			`,
 		},
 		{
-			Version:     10,
+			Version:     11,
 			Description: "Create tab_color",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_color (
@@ -204,7 +238,7 @@ var (
 			`,
 		},
 		{
-			Version:     11,
+			Version:     12,
 			Description: "Create tab_product_stock",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_product_stock (
@@ -233,7 +267,7 @@ var (
 			`,
 		},
 		{
-			Version:     12,
+			Version:     13,
 			Description: "Create tab_lead_address",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_lead_address (
@@ -261,7 +295,7 @@ var (
 			`,
 		},
 		{
-			Version:     13,
+			Version:     14,
 			Description: "Create tab_sale_product",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_sale_product (
@@ -290,8 +324,8 @@ var (
 			`,
 		},
 		{
-			Version:     14,
-			Description: "Insert data into tab_payment_method",
+			Version:     15,
+			Description: "Create tab_stock_input",
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_stock_input (
 					stock_input_id INT UNSIGNED NOT NULL,
@@ -311,7 +345,7 @@ var (
 			`,
 		},
 		{
-			Version:     15,
+			Version:     16,
 			Description: "Insert data into tab_payment_method",
 			Script: `
 				INSERT INTO tab_payment_method 
@@ -323,7 +357,7 @@ var (
 			`,
 		},
 		{
-			Version:     16,
+			Version:     17,
 			Description: "Insert data into tab_send_method",
 			Script: `
 				INSERT INTO tab_send_method 
