@@ -6,7 +6,6 @@ import "database/sql"
 type DataManager interface {
 	RepoManager
 	Begin() (TransactionManager, error)
-	Close() error
 }
 
 // TransactionManager holds the methods that manipulates the main
