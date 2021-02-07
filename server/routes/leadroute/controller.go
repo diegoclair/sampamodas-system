@@ -20,7 +20,7 @@ var (
 	once     sync.Once
 )
 
-//Controller is a interface to interact with services
+//Controller holds lead handler functions
 type Controller struct {
 	leadService contract.LeadService
 	mapper      mapper.Mapper

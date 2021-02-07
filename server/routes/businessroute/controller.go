@@ -21,7 +21,7 @@ var (
 	once     sync.Once
 )
 
-//Controller is a interface to interact with services
+//Controller holds business handler functions
 type Controller struct {
 	businessService contract.BusinessService
 	mapper          mapper.Mapper
