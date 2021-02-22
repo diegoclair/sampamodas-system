@@ -9,7 +9,7 @@ WORKDIR /app
 # Copy the source from the current directory to the working Directory inside the container 
 COPY . /app
 
-RUN go build
+RUN GOOS=linux GOARCH=amd64 go build -ldflags="-s -w" -o backend
 
 # Add docker-compose-wait tool -------------------
 ENV WAIT_VERSION 2.7.2
@@ -21,4 +21,4 @@ EXPOSE 5000
 #This is used to run the application with live reload
 RUN go get github.com/githubnemo/CompileDaemon
 
-ENTRYPOINT /wait && CompileDaemon --build="go build -o myapp ." --command=./myapp
+ENTRYPOINT /wait && CompileDaemon --build="go build -o myapp ." --command="./myapp rest"

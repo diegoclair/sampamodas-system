@@ -1,33 +1,22 @@
+/*
+Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package main
 
-import (
-	"os"
-
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/sampamodas-system/backend/data"
-	"github.com/diegoclair/sampamodas-system/backend/server"
-
-	"github.com/diegoclair/sampamodas-system/backend/service"
-)
+import "github.com/diegoclair/sampamodas-system/backend/cmd"
 
 func main() {
-	logger.Info("Reading the initial configs...")
-
-	db, err := data.Connect()
-	if err != nil {
-		panic(err)
-	}
-	svc := service.New(db)
-	server := server.InitServer(svc)
-	logger.Info("About to start the application...")
-
-	port := os.Getenv("PORT")
-
-	if port == "" {
-		port = "5000"
-	}
-
-	if err := server.Start(":" + port); err != nil {
-		panic(err)
-	}
+	cmd.Execute()
 }
