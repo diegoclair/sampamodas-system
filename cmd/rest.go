@@ -16,8 +16,6 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/diegoclair/sampamodas-system/backend/application/rest"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +25,6 @@ var restCmd = &cobra.Command{
 	Use:   "rest",
 	Short: "To start a rest server on port 5000",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ponto0")
 		rest.StartRestServer()
 	},
 }

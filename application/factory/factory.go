@@ -1,7 +1,6 @@
 package factory
 
 import (
-	"fmt"
 	"log"
 	"sync"
 
@@ -30,9 +29,9 @@ var (
 
 //GetDomainServices to get instace of all services
 func GetDomainServices() *Services {
-	fmt.Println("ponto1")
+
 	once.Do(func() {
-		fmt.Println("ponto2")
+
 		data, err := data.Connect()
 		if err != nil {
 			log.Fatalf("Error to connect data repositories: %v", err)
@@ -51,7 +50,7 @@ func GetDomainServices() *Services {
 		instance.LeadService = svm.LeadService(svc)
 		instance.ProductService = svm.ProductService(svc)
 		instance.SaleService = svm.SaleService(svc, instance.ProductService)
-
 	})
+
 	return instance
 }
