@@ -8,7 +8,7 @@ import (
 	"github.com/IQ-tech/go-mapper"
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
+	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 	"github.com/diegoclair/sampamodas-system/backend/server/viewmodel"
 

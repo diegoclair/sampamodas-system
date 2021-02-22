@@ -4,10 +4,9 @@ import (
 	"os"
 
 	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/sampamodas-system/backend/data"
+	"github.com/diegoclair/sampamodas-system/backend/domain/service"
+	"github.com/diegoclair/sampamodas-system/backend/infra/data"
 	"github.com/diegoclair/sampamodas-system/backend/server"
-
-	"github.com/diegoclair/sampamodas-system/backend/service"
 )
 
 func main() {

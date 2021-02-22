@@ -3,10 +3,10 @@ package service
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
+	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
-	"github.com/diegoclair/sampamodas-system/backend/infra/errors"
-	"github.com/diegoclair/sampamodas-system/backend/infra/format"
+	"github.com/diegoclair/sampamodas-system/backend/util/errors"
+	"github.com/diegoclair/sampamodas-system/backend/util/format"
 )
 
 type productService struct {
@@ -22,14 +22,14 @@ func newProductService(svc *Service) contract.ProductService {
 
 func (s *productService) GetProducts() (products []entity.Product, err resterrors.RestErr) {
 
-	products, err = s.svc.db.Product().GetProducts()
+	products, err = s.svc.dm.MySQL().Product().GetProducts()
 	if err != nil {
 		logger.Error("productService.GetProducts.GetProducts", err)
 		return products, err
 	}
 
 	for i := range products {
-		products[i].ProductStock, err = s.svc.db.Product().GetStockProductByProductID(products[i].ID)
+		products[i].ProductStock, err = s.svc.dm.MySQL().Product().GetStockProductByProductID(products[i].ID)
 		if err != nil {
 			logger.Error("productService.GetProducts.GetStockProductByProductID", err)
 			return products, err
@@ -41,7 +41,7 @@ func (s *productService) GetProducts() (products []entity.Product, err resterror
 
 func (s *productService) GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr) {
 
-	product, restErr = s.svc.db.Product().GetProductByID(productID)
+	product, restErr = s.svc.dm.MySQL().Product().GetProductByID(productID)
 	if restErr != nil {
 		logger.Error("productService.GetProductByID.GetProductByID", restErr)
 		return product, restErr
@@ -51,19 +51,19 @@ func (s *productService) GetProductByID(productID int64) (product entity.Product
 
 func (s *productService) GetProductByProductStockID(productStockID int64) (product entity.Product, restErr resterrors.RestErr) {
 
-	productID, restErr := s.svc.db.Product().GetProductIDByProductStockID(productStockID)
+	productID, restErr := s.svc.dm.MySQL().Product().GetProductIDByProductStockID(productStockID)
 	if restErr != nil {
 		logger.Error("productService.GetProductByProductStockID.GetProductIDByProductStockID", restErr)
 		return product, restErr
 	}
 
-	product, restErr = s.svc.db.Product().GetProductByID(productID)
+	product, restErr = s.svc.dm.MySQL().Product().GetProductByID(productID)
 	if restErr != nil {
 		logger.Error("productService.GetProductByProductStockID.GetProductByID", restErr)
 		return product, restErr
 	}
 
-	product.ProductStock, restErr = s.svc.db.Product().GetStockProductByProductID(productID)
+	product.ProductStock, restErr = s.svc.dm.MySQL().Product().GetStockProductByProductID(productID)
 	if restErr != nil {
 		logger.Error("productService.GetProducts.GetStockProductByProductID", restErr)
 		return product, restErr
@@ -84,7 +84,7 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 		return err
 	}
 
-	tx, txErr := s.svc.db.Begin()
+	tx, txErr := s.svc.dm.MySQL().Begin()
 	if txErr != nil {
 		logger.Error("productService.CreateProduct.Begin: ", txErr)
 		return resterrors.NewInternalServerError("Database transaction error")
@@ -135,9 +135,9 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 	return nil
 }
 
-func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
+func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) (restErr resterrors.RestErr) {
 
-	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
+	actualAvailableQuantity, restErr := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
 	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
 		logger.Error("productService.addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
 		return restErr
@@ -154,7 +154,7 @@ func (s *productService) addStockAvailableQuantity(productStockID, quantity int6
 	return nil
 }
 
-func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.TransactionManager) (restErr resterrors.RestErr) {
+func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.MysqlTransaction) (restErr resterrors.RestErr) {
 
 	restErr = tx.Product().RegisterStockInput(productStockID, quantity)
 	if restErr != nil {
@@ -168,7 +168,7 @@ func (s *productService) registerStockInput(productStockID, quantity int64, tx c
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {
 
 	format.FirstLetterUpperCase(&brandName)
-	brandID, err = s.svc.db.Product().GetBrandByName(brandName)
+	brandID, err = s.svc.dm.MySQL().Product().GetBrandByName(brandName)
 	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
 		logger.Error("getColorIDByName.GetBrandByName: ", err)
 		return brandID, err
@@ -178,7 +178,7 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 		return brandID, nil
 	}
 
-	brandID, err = s.svc.db.Product().CreateBrand(brandName)
+	brandID, err = s.svc.dm.MySQL().Product().CreateBrand(brandName)
 	if err != nil {
 		logger.Error("getColorIDByName.CreateBrand: ", err)
 		return brandID, err
@@ -190,7 +190,7 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 func (s *productService) getColorIDByName(colorName string) (colorID int64, err resterrors.RestErr) {
 
 	format.FirstLetterUpperCase(&colorName)
-	colorID, err = s.svc.db.Product().GetColorByName(colorName)
+	colorID, err = s.svc.dm.MySQL().Product().GetColorByName(colorName)
 	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
 		logger.Error("getColorIDByName.GetColorByName: ", err)
 		return colorID, err
@@ -200,7 +200,7 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 		return colorID, nil
 	}
 
-	colorID, err = s.svc.db.Product().CreateColor(colorName)
+	colorID, err = s.svc.dm.MySQL().Product().CreateColor(colorName)
 	if err != nil {
 		logger.Error("getColorIDByName.CreateColor: ", err)
 		return colorID, err
@@ -212,7 +212,7 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 func (s *productService) getGenderIDByName(genderName string) (genderID int64, err resterrors.RestErr) {
 
 	format.FirstLetterUpperCase(&genderName)
-	genderID, err = s.svc.db.Product().GetGenderByName(genderName)
+	genderID, err = s.svc.dm.MySQL().Product().GetGenderByName(genderName)
 	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
 		logger.Error("getColorIDByName.GetGenderByName: ", err)
 		return genderID, err
@@ -222,7 +222,7 @@ func (s *productService) getGenderIDByName(genderName string) (genderID int64, e
 		return genderID, nil
 	}
 
-	genderID, err = s.svc.db.Product().CreateGender(genderName)
+	genderID, err = s.svc.dm.MySQL().Product().CreateGender(genderName)
 	if err != nil {
 		logger.Error("getColorIDByName.CreateGender: ", err)
 		return genderID, err

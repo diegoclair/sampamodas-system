@@ -5,9 +5,9 @@ import (
 
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
+	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
-	"github.com/diegoclair/sampamodas-system/backend/infra/errors"
+	"github.com/diegoclair/sampamodas-system/backend/util/errors"
 )
 
 type saleService struct {
@@ -24,7 +24,7 @@ func newSaleService(svc *Service, productService contract.ProductService) contra
 
 func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr resterrors.RestErr) {
 
-	tx, txErr := s.svc.db.Begin()
+	tx, txErr := s.svc.dm.MySQL().Begin()
 	if txErr != nil {
 		logger.Error("saleService.CreateSale.Begin: ", txErr)
 		return saleID, resterrors.NewInternalServerError("Database transaction error")
@@ -82,9 +82,9 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr rester
 	return saleID, nil
 }
 
-func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int64, tx contract.TransactionManager) resterrors.RestErr {
+func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) resterrors.RestErr {
 
-	actualAvailableQuantity, restErr := s.svc.db.Product().GetAvailableQuantityByProductStockID(productStockID)
+	actualAvailableQuantity, restErr := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
 	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
 		logger.Error("saleService.removeStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
 		return restErr

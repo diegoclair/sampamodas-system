@@ -5,13 +5,21 @@ import (
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
-//RepoManager defines the repository aggregator interface
-type RepoManager interface {
+//MySQLRepo defines the repository aggregator interface
+type MySQLRepo interface {
+	Begin() (MysqlTransaction, error)
 	Business() BusinessRepo
 	Company() CompanyRepo
 	Lead() LeadRepo
 	Product() ProductRepo
 	Sale() SaleRepo
+}
+
+// MysqlTransaction holds the methods that manipulates the main data, from within a transaction.
+type MysqlTransaction interface {
+	MySQLRepo
+	Rollback() error
+	Commit() error
 }
 
 // BusinessRepo defines the data set for business repo

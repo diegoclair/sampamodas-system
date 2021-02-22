@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 	"github.com/spf13/cast"
 	"github.com/spf13/viper"
@@ -9,7 +10,12 @@ import (
 // GetDBConfig to read initial config
 func GetDBConfig() (config entity.InitialConfig) {
 	viper.SetConfigFile(".env")
-	viper.ReadInConfig()
+	viper.AutomaticEnv()
+	err := viper.ReadInConfig()
+	if err != nil {
+		logger.Error("Error to read configs: ", err)
+		panic(err)
+	}
 	config.Username = cast.ToString(viper.Get("DB_USER"))
 	config.Password = cast.ToString(viper.Get("DB_PASSWORD"))
 	config.Host = cast.ToString(viper.Get("DB_HOST"))

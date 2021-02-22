@@ -1,18 +1,18 @@
 package service
 
 import (
-	"github.com/diegoclair/sampamodas-system/backend/domain/contract"
+	"github.com/diegoclair/sampamodas-system/backend/contract"
 )
 
 // Service holds the domain service repositories
 type Service struct {
-	db contract.DataManager
+	dm contract.DataManager
 }
 
 // New returns a new domain Service instance
-func New(db contract.DataManager) *Service {
+func New(dm contract.DataManager) *Service {
 	svc := new(Service)
-	svc.db = db
+	svc.dm = dm
 
 	return svc
 }
