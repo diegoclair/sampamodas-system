@@ -18,7 +18,8 @@ var (
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (company_id),
-					UNIQUE INDEX id_UNIQUE (company_id ASC) VISIBLE)
+					UNIQUE INDEX id_UNIQUE (company_id ASC) VISIBLE,
+					UNIQUE INDEX document_number_UNIQUE (document_number ASC) VISIBLE)
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
 		},
