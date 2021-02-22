@@ -4,9 +4,9 @@ import (
 	"os"
 
 	"github.com/diegoclair/go_utils-lib/logger"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest"
 	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 	"github.com/diegoclair/sampamodas-system/backend/infra/data"
-	"github.com/diegoclair/sampamodas-system/backend/server"
 )
 
 func main() {
@@ -17,7 +17,7 @@ func main() {
 		panic(err)
 	}
 	svc := service.New(db)
-	server := server.InitServer(svc)
+	server := rest.InitServer(svc)
 	logger.Info("About to start the application...")
 
 	port := os.Getenv("PORT")

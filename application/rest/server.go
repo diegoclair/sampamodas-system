@@ -1,14 +1,14 @@
-package server
+package rest
 
 import (
 	"github.com/IQ-tech/go-mapper"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/businessroute"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/companyroute"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/leadroute"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/pingroute"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/productroute"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/saleroute"
 	"github.com/diegoclair/sampamodas-system/backend/domain/service"
-	"github.com/diegoclair/sampamodas-system/backend/server/routes/businessroute"
-	"github.com/diegoclair/sampamodas-system/backend/server/routes/companyroute"
-	"github.com/diegoclair/sampamodas-system/backend/server/routes/leadroute"
-	"github.com/diegoclair/sampamodas-system/backend/server/routes/pingroute"
-	"github.com/diegoclair/sampamodas-system/backend/server/routes/productroute"
-	"github.com/diegoclair/sampamodas-system/backend/server/routes/saleroute"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )

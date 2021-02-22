@@ -1,4 +1,4 @@
-package leadroute
+package saleroute
 
 import (
 	"fmt"
@@ -8,9 +8,9 @@ import (
 	"github.com/IQ-tech/go-mapper"
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/viewmodel"
 	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
-	"github.com/diegoclair/sampamodas-system/backend/server/viewmodel"
 
 	"github.com/labstack/echo/v4"
 )
@@ -20,56 +20,56 @@ var (
 	once     sync.Once
 )
 
-//Controller holds lead handler functions
+//Controller holds sales handler functions
 type Controller struct {
-	leadService contract.LeadService
+	saleService contract.SaleService
 	mapper      mapper.Mapper
 }
 
 //NewController to handle requests
-func NewController(leadService contract.LeadService, mapper mapper.Mapper) *Controller {
+func NewController(saleService contract.SaleService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
-			leadService: leadService,
+			saleService: saleService,
 			mapper:      mapper,
 		}
 	})
 	return instance
 }
 
-func (s *Controller) handleCreateLead(c echo.Context) error {
+func (s *Controller) handleCreateSale(c echo.Context) error {
 
-	input := viewmodel.Lead{}
+	input := viewmodel.Sale{}
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateLead.c.Bind: ", err)
+		logger.Error("handleCreateSale.c.Bind: ", err)
 		restErr := resterrors.NewBadRequestError("Invalid json body")
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	lead := entity.Lead{}
+	sale := entity.Sale{}
 
-	err = s.mapper.From(input).To(&lead)
+	err = s.mapper.From(input).To(&sale)
 	if err != nil {
 		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	leadID, restErr := s.leadService.CreateLead(lead)
+	saleID, restErr := s.saleService.CreateSale(sale)
 	if restErr != nil {
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	response := viewmodel.CreateLeadResponse{}
-	response.LeadID = leadID
+	response := viewmodel.CreateSaleResponse{}
+	response.SaleID = saleID
 
 	return c.JSON(http.StatusOK, response)
 }
 
-func (s *Controller) handleCreateLeadAddress(c echo.Context) error {
+func (s *Controller) handleSaleProduct(c echo.Context) error {
 
-	input := viewmodel.LeadAddress{}
+	input := viewmodel.SaleProduct{}
 
 	err := c.Bind(&input)
 	if err != nil {
@@ -78,37 +78,18 @@ func (s *Controller) handleCreateLeadAddress(c echo.Context) error {
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	leadAddress := entity.LeadAddress{}
+	saleProduct := entity.SaleProduct{}
 
-	err = s.mapper.From(input).To(&leadAddress)
+	err = s.mapper.From(input).To(&saleProduct)
 	if err != nil {
 		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
-	restErr := s.leadService.CreateLeadAddress(leadAddress)
+	restErr := s.saleService.CreateSaleProduct(saleProduct)
 	if restErr != nil {
 		return c.JSON(restErr.StatusCode(), restErr)
 	}
 
 	return c.NoContent(http.StatusNoContent)
-}
-
-func (s *Controller) handleGetLeadByPhoneNumber(c echo.Context) error {
-
-	phoneNumber := c.Param("phone_number")
-
-	lead, err := s.leadService.GetLeadByPhoneNumber(phoneNumber)
-	if err != nil {
-		return c.JSON(err.StatusCode(), err)
-	}
-
-	response := viewmodel.Lead{}
-	mapErr := s.mapper.From(lead).To(&response)
-	if mapErr != nil {
-		err = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(mapErr))
-		return c.JSON(err.StatusCode(), err)
-	}
-
-	return c.JSON(http.StatusOK, response)
 }
