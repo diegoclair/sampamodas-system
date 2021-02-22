@@ -1,14 +1,16 @@
 package rest
 
 import (
-	"github.com/IQ-tech/go-mapper"
+	"os"
+
+	"github.com/diegoclair/go_utils-lib/logger"
+	"github.com/diegoclair/sampamodas-system/backend/application/factory"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/businessroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/companyroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/leadroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/pingroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/productroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/saleroute"
-	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -22,32 +24,42 @@ type controller struct {
 	saleController     *saleroute.Controller
 }
 
+//StartRestServer starts the restServer
+func StartRestServer() {
+	server := initServer()
+
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "5000"
+	}
+
+	logger.Info("About to start the application...")
+
+	if err := server.Start(":" + port); err != nil {
+		panic(err)
+	}
+}
+
 //InitServer to initialize the server
-func InitServer(svc *service.Service) *echo.Echo {
-	mapper := mapper.New()
-	svm := service.NewServiceManager()
+func initServer() *echo.Echo {
+
+	factory := factory.GetDomainServices()
+
 	srv := echo.New()
-
-	businessService := svm.BusinessService(svc)
-	companyService := svm.CompanyService(svc)
-	leadService := svm.LeadService(svc)
-	productService := svm.ProductService(svc)
-	saleService := svm.SaleService(svc, productService)
-
 	srv.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
-	return setupRoutes(srv, &controller{
+	return registerRoutes(srv, &controller{
 		pingController:     pingroute.NewController(),
-		businessController: businessroute.NewController(businessService, mapper),
-		companyController:  companyroute.NewController(companyService, mapper),
-		leadController:     leadroute.NewController(leadService, mapper),
-		productController:  productroute.NewController(productService, mapper),
-		saleController:     saleroute.NewController(saleService, mapper),
+		businessController: businessroute.NewController(factory.BusinessService, factory.Mapper),
+		companyController:  companyroute.NewController(factory.CompanyService, factory.Mapper),
+		leadController:     leadroute.NewController(factory.LeadService, factory.Mapper),
+		productController:  productroute.NewController(factory.ProductService, factory.Mapper),
+		saleController:     saleroute.NewController(factory.SaleService, factory.Mapper),
 	})
 }
 
-//setupRoutes - Register and instantiate the routes
-func setupRoutes(srv *echo.Echo, s *controller) *echo.Echo {
+//registerRoutes - Register and instantiate routes
+func registerRoutes(srv *echo.Echo, s *controller) *echo.Echo {
 
 	pingroute.NewRouter(s.pingController, srv).RegisterRoutes()
 	businessroute.NewRouter(s.businessController, srv).RegisterRoutes()

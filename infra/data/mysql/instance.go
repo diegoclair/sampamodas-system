@@ -28,10 +28,10 @@ type mysqlConn struct {
 //Instance returns an instance of a MySQLRepo
 func Instance() (contract.MySQLRepo, error) {
 	onceDB.Do(func() {
-		cfg := config.GetDBConfig()
+		cfg := config.GetConfigEnvironment()
 
 		dataSourceName := fmt.Sprintf("%s:root@tcp(%s:%s)/%s?charset=utf8",
-			cfg.Username, cfg.Host, cfg.Port, cfg.DBName,
+			cfg.MySQL.Username, cfg.MySQL.Host, cfg.MySQL.Port, cfg.MySQL.DBName,
 		)
 
 		log.Println("Connecting to database...")

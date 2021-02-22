@@ -21,4 +21,4 @@ EXPOSE 5000
 #This is used to run the application with live reload
 RUN go get github.com/githubnemo/CompileDaemon
 
-ENTRYPOINT /wait && CompileDaemon --build="go build -o myapp ." --command=./myapp
+ENTRYPOINT /wait && CompileDaemon --build="go build -o myapp ." --command="./myapp rest"
