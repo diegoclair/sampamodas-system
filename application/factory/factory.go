@@ -37,19 +37,21 @@ func GetDomainServices() *Services {
 			log.Fatalf("Error to connect data repositories: %v", err)
 		}
 
-		svc := service.New(data)
-
-		mapper := mapper.New()
+		cfg := config.GetConfigEnvironment()
+		svc := service.New(data, cfg)
 		svm := service.NewServiceManager()
+		mapper := mapper.New()
 
-		instance = &Services{}
-		instance.Cfg = config.GetConfigEnvironment()
-		instance.Mapper = mapper
-		instance.BusinessService = svm.BusinessService(svc)
-		instance.CompanyService = svm.CompanyService(svc)
-		instance.LeadService = svm.LeadService(svc)
-		instance.ProductService = svm.ProductService(svc)
-		instance.SaleService = svm.SaleService(svc, instance.ProductService)
+		instance = &Services{
+			Cfg:             cfg,
+			Mapper:          mapper,
+			BusinessService: svm.BusinessService(svc),
+			CompanyService:  svm.CompanyService(svc),
+			LeadService:     svm.LeadService(svc),
+			ProductService:  svm.ProductService(svc),
+			SaleService:     svm.SaleService(svc, instance.ProductService),
+		}
+
 	})
 
 	return instance
