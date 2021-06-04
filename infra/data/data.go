@@ -1,7 +1,6 @@
 package data
 
 import (
-	"database/sql"
 	"log"
 
 	"github.com/diegoclair/sampamodas-system/backend/contract"
@@ -11,7 +10,6 @@ import (
 //we can add here more than one database
 type data struct {
 	mysqlRepo contract.MySQLRepo
-	mysqlDB   *sql.DB
 }
 
 // Connect returns a instace of mysql db
