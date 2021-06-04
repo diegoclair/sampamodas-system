@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/diegoclair/go_utils-lib/logger"
@@ -35,12 +36,12 @@ func StartRestServer() {
 
 	logger.Info("About to start the application...")
 
-	if err := server.Start(":" + port); err != nil {
+	if err := server.Start(fmt.Sprintf(":%s", port)); err != nil {
 		panic(err)
 	}
 }
 
-//InitServer to initialize the server
+//initServer to initialize the server
 func initServer() *echo.Echo {
 
 	factory := factory.GetDomainServices()
