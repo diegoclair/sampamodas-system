@@ -74,7 +74,7 @@ func (s *Controller) handleGetCompanies(c echo.Context) error {
 	return routeutils.ResponseAPIOK(c, response)
 }
 
-func (s *Controller) handleGetCompanyByID(c echo.Context) error {
+func (s *Controller) handleGetCompanyByUUID(c echo.Context) error {
 
 	companyUUID, err := routeutils.GetAndValidateStringParam(c, "uuid", true)
 	if err != nil {

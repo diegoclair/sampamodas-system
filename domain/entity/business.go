@@ -5,6 +5,6 @@ type Business struct {
 	ID          int64
 	UUID        string
 	CompanyUUID string
-	CompanyID   string
+	CompanyID   int64
 	Name        string
 }

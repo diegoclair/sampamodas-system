@@ -133,7 +133,11 @@ func (s *businessRepo) GetBusinessesByCompanyUUID(companyUUID string) (businesse
 			tb.name
 
 		FROM 	tab_business	tb
-		WHERE 	tb.company_uuid	= ?
+
+		INNER JOIN tab_company 	tc
+		ON 		tb.company_id 	= 	tc.company_id
+		
+		WHERE 	tc.company_uuid	= 	?
 	`
 
 	stmt, err := s.db.Prepare(query)

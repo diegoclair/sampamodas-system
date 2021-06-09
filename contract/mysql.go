@@ -34,6 +34,7 @@ type CompanyRepo interface {
 	CreateCompany(company entity.Company) error
 	GetCompanies() (companies []entity.Company, err error)
 	GetCompanyByUUID(companyUUID string) (company entity.Company, err error)
+	GetCompanyIDByUUID(companyUUID string) (companyID int64, err error)
 }
 
 // LeadRepo defines the data set for lead

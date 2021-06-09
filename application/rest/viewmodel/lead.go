@@ -3,7 +3,7 @@ package viewmodel
 import "github.com/diegoclair/sampamodas-system/backend/util/format"
 
 type Lead struct {
-	UUID        int64         `json:"uuid,omitempty"`
+	UUID        string        `json:"uuid,omitempty"`
 	Name        string        `json:"name,omitempty"`
 	Email       string        `json:"email,omitempty"`
 	PhoneNumber string        `json:"phone_number,omitempty"`
@@ -18,7 +18,7 @@ func (l *Lead) Validate() error {
 
 type LeadAddress struct {
 	LeadAddressID  int64  `json:"lead_address_id,omitempty"`
-	LeadUUID       int64  `json:"lead_uuid,omitempty"`
+	LeadUUID       string `json:"lead_uuid,omitempty"`
 	AddressType    string `json:"address_type,omitempty"`
 	Street         string `json:"street,omitempty"`
 	Number         string `json:"number,omitempty"`

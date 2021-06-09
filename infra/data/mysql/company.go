@@ -128,3 +128,34 @@ func (s *companyRepo) GetCompanyByUUID(companyUUID string) (company entity.Compa
 
 	return company, nil
 }
+
+func (s *companyRepo) GetCompanyIDByUUID(companyUUID string) (companyID int64, err error) {
+
+	query := `
+		SELECT
+			tc.company_id
+
+		FROM 	tab_company 	tc
+		WHERE  	tc.company_uuid 	= ?
+	`
+
+	stmt, err := s.db.Prepare(query)
+	if err != nil {
+		return companyID, mysqlutils.HandleMySQLError(err)
+	}
+	defer stmt.Close()
+
+	result := stmt.QueryRow(companyUUID)
+	if err != nil {
+		return companyID, mysqlutils.HandleMySQLError(err)
+	}
+
+	err = result.Scan(
+		&companyID,
+	)
+	if err != nil {
+		return companyID, mysqlutils.HandleMySQLError(err)
+	}
+
+	return companyID, nil
+}

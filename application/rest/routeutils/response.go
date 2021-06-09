@@ -3,6 +3,7 @@ package routeutils
 import (
 	"net/http"
 
+	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/labstack/echo/v4"
 )
@@ -39,10 +40,8 @@ func HandleAPIError(c echo.Context, errorToHandle error) (err error) {
 	statusCode := http.StatusServiceUnavailable
 	errorMessage := ErrorMessageServiceUnavailable
 
-	logger := c.Logger()
-
 	if errorToHandle != nil {
-		logger.Error(errorToHandle)
+		logger.Error("HandleAPIError: ", errorToHandle)
 
 		errorString := errorToHandle.Error()
 
