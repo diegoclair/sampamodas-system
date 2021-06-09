@@ -73,7 +73,6 @@ type SaleService interface {
 }
 
 type serviceManager struct {
-	svc *Service
 }
 
 // NewServiceManager return a service manager instance

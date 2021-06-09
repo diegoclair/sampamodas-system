@@ -1,8 +1,10 @@
 package service
 
 import (
-	"github.com/diegoclair/go_utils-lib/logger"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
+	"github.com/diegoclair/go_utils-lib/v2/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/util/errors"
 	"github.com/twinj/uuid"
 )
 
@@ -65,10 +67,14 @@ func (s *businessService) CreateBusiness(business entity.Business) error {
 	defer logger.Info("CreateBusiness: Process Finished")
 
 	companyID, err := s.svc.dm.MySQL().Company().GetCompanyIDByUUID(business.CompanyUUID)
-	if err != nil {
+	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
 		logger.Error("CreateBusiness.GetCompanyIDByUUID: ", err)
 		return err
+	} else if err != nil && errors.SQLResultIsEmpty(err.Error()) {
+		logger.Error("CreateBusiness.GetCompanyIDByUUID: company uuid don't exists", nil)
+		return resterrors.NewBadRequestError("Invalid company UUID received", nil)
 	}
+
 	business.UUID = uuid.NewV4().String()
 	business.CompanyID = companyID
 

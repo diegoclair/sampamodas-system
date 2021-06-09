@@ -3,8 +3,8 @@ package routeutils
 import (
 	"net/http"
 
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
+	"github.com/diegoclair/go_utils-lib/v2/resterrors"
 	"github.com/labstack/echo/v4"
 )
 

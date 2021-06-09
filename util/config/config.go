@@ -3,7 +3,7 @@ package config
 import (
 	"sync"
 
-	"github.com/diegoclair/go_utils-lib/logger"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
 	"github.com/spf13/viper"
 )
 

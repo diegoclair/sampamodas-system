@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
+	"github.com/diegoclair/go_utils-lib/v2/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 	"github.com/diegoclair/sampamodas-system/backend/util/errors"
@@ -141,7 +141,7 @@ func (s *productService) CreateProduct(product entity.Product) (err error) {
 	err = tx.Commit()
 	if err != nil {
 		logger.Error("CreateProduct.Commit: ", err)
-		return resterrors.NewInternalServerError("Database transaction commit error")
+		return resterrors.NewInternalServerError("Database transaction commit error", err)
 	}
 
 	return nil

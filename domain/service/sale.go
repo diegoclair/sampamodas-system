@@ -3,8 +3,8 @@ package service
 import (
 	"fmt"
 
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
+	"github.com/diegoclair/go_utils-lib/v2/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 	"github.com/diegoclair/sampamodas-system/backend/util/errors"
@@ -30,7 +30,7 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, err error) {
 	tx, err := s.svc.dm.MySQL().Begin()
 	if err != nil {
 		logger.Error("CreateSale.Begin: ", err)
-		return saleID, resterrors.NewInternalServerError("Database transaction error")
+		return saleID, resterrors.NewInternalServerError("Database transaction error", err)
 	}
 	defer tx.Rollback()
 
@@ -46,7 +46,7 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, err error) {
 		product, err := s.productService.GetProductByProductStockID(sale.SaleProduct[i].ProductStockID)
 		if err != nil && errors.SQLResultIsEmpty(err.Error()) {
 			logger.Error("ProductStockID is invalid", err)
-			return saleID, resterrors.NewBadRequestError("O ID do estoque do produto é inválido, contate o administrador.")
+			return saleID, resterrors.NewBadRequestError("O ID do estoque do produto é inválido, contate o administrador.", err)
 
 		}
 		if err != nil {
@@ -79,7 +79,7 @@ func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, err error) {
 	err = tx.Commit()
 	if err != nil {
 		logger.Error("CreateSale.Commit: ", err)
-		return saleID, resterrors.NewInternalServerError("Database transaction commit error")
+		return saleID, resterrors.NewInternalServerError("Database transaction commit error", err)
 	}
 
 	return saleID, nil
@@ -98,7 +98,7 @@ func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int6
 
 	if quantity > actualAvailableQuantity {
 		logger.Error(fmt.Sprintf("The sale quantity is bigger than the stock quantity: saleQuantity: %v - availableQuantity: %v", quantity, actualAvailableQuantity), nil)
-		return resterrors.NewBadRequestError("A quantidade de venda do produto não pode ser superior à quantidade disponível no estoque.")
+		return resterrors.NewBadRequestError("A quantidade de venda do produto não pode ser superior à quantidade disponível no estoque.", nil)
 	}
 	availableQuantity := actualAvailableQuantity - quantity
 

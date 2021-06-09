@@ -1,7 +1,7 @@
 package mysql
 
 import (
-	"github.com/diegoclair/go_utils-lib/mysqlutils"
+	"github.com/diegoclair/go_utils-lib/v2/mysqlutils"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
