@@ -14,13 +14,13 @@ type productService struct {
 }
 
 //newProductService return a new instance of the service
-func newProductService(svc *Service) contract.ProductService {
+func newProductService(svc *Service) ProductService {
 	return &productService{
 		svc: svc,
 	}
 }
 
-func (s *productService) GetProducts() (products []entity.Product, err resterrors.RestErr) {
+func (s *productService) GetProducts() (products []entity.Product, err error) {
 
 	products, err = s.svc.dm.MySQL().Product().GetProducts()
 	if err != nil {
@@ -39,40 +39,40 @@ func (s *productService) GetProducts() (products []entity.Product, err resterror
 	return
 }
 
-func (s *productService) GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr) {
+func (s *productService) GetProductByID(productID int64) (product entity.Product, err error) {
 
-	product, restErr = s.svc.dm.MySQL().Product().GetProductByID(productID)
-	if restErr != nil {
-		logger.Error("productService.GetProductByID.GetProductByID", restErr)
-		return product, restErr
+	product, err = s.svc.dm.MySQL().Product().GetProductByID(productID)
+	if err != nil {
+		logger.Error("productService.GetProductByID.GetProductByID", err)
+		return product, err
 	}
 	return product, nil
 }
 
-func (s *productService) GetProductByProductStockID(productStockID int64) (product entity.Product, restErr resterrors.RestErr) {
+func (s *productService) GetProductByProductStockID(productStockID int64) (product entity.Product, err error) {
 
-	productID, restErr := s.svc.dm.MySQL().Product().GetProductIDByProductStockID(productStockID)
-	if restErr != nil {
-		logger.Error("productService.GetProductByProductStockID.GetProductIDByProductStockID", restErr)
-		return product, restErr
+	productID, err := s.svc.dm.MySQL().Product().GetProductIDByProductStockID(productStockID)
+	if err != nil {
+		logger.Error("productService.GetProductByProductStockID.GetProductIDByProductStockID", err)
+		return product, err
 	}
 
-	product, restErr = s.svc.dm.MySQL().Product().GetProductByID(productID)
-	if restErr != nil {
-		logger.Error("productService.GetProductByProductStockID.GetProductByID", restErr)
-		return product, restErr
+	product, err = s.svc.dm.MySQL().Product().GetProductByID(productID)
+	if err != nil {
+		logger.Error("productService.GetProductByProductStockID.GetProductByID", err)
+		return product, err
 	}
 
-	product.ProductStock, restErr = s.svc.dm.MySQL().Product().GetStockProductByProductID(productID)
-	if restErr != nil {
-		logger.Error("productService.GetProducts.GetStockProductByProductID", restErr)
-		return product, restErr
+	product.ProductStock, err = s.svc.dm.MySQL().Product().GetStockProductByProductID(productID)
+	if err != nil {
+		logger.Error("productService.GetProducts.GetStockProductByProductID", err)
+		return product, err
 	}
 
 	return
 }
 
-func (s *productService) CreateProduct(product entity.Product) (err resterrors.RestErr) {
+func (s *productService) CreateProduct(product entity.Product) (err error) {
 
 	product.Brand.ID, err = s.getBrandIDByName(product.Brand.Name)
 	if err != nil {
@@ -84,10 +84,10 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 		return err
 	}
 
-	tx, txErr := s.svc.dm.MySQL().Begin()
-	if txErr != nil {
-		logger.Error("productService.CreateProduct.Begin: ", txErr)
-		return resterrors.NewInternalServerError("Database transaction error")
+	tx, err := s.svc.dm.MySQL().Begin()
+	if err != nil {
+		logger.Error("productService.CreateProduct.Begin: Database transaction error: ", err)
+		return err
 	}
 	defer tx.Rollback()
 
@@ -126,50 +126,50 @@ func (s *productService) CreateProduct(product entity.Product) (err resterrors.R
 
 	}
 
-	txErr = tx.Commit()
-	if txErr != nil {
-		logger.Error("productService.CreateProduct.Commit: ", txErr)
+	err = tx.Commit()
+	if err != nil {
+		logger.Error("productService.CreateProduct.Commit: ", err)
 		return resterrors.NewInternalServerError("Database transaction commit error")
 	}
 
 	return nil
 }
 
-func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) (restErr resterrors.RestErr) {
+func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) (err error) {
 
-	actualAvailableQuantity, restErr := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
-	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
-		logger.Error("productService.addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
-		return restErr
+	actualAvailableQuantity, err := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
+	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
+		logger.Error("productService.addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", err)
+		return err
 	}
 
 	availableQuantity := actualAvailableQuantity + quantity
 
-	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
-	if restErr != nil {
-		logger.Error("productService.addStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", restErr)
-		return restErr
+	err = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
+	if err != nil {
+		logger.Error("productService.addStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", err)
+		return err
 	}
 
 	return nil
 }
 
-func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.MysqlTransaction) (restErr resterrors.RestErr) {
+func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.MysqlTransaction) (err error) {
 
-	restErr = tx.Product().RegisterStockInput(productStockID, quantity)
-	if restErr != nil {
-		logger.Error("productService.registerStockInput.RegisterStockInput: ", restErr)
-		return restErr
+	err = tx.Product().RegisterStockInput(productStockID, quantity)
+	if err != nil {
+		logger.Error("productService.registerStockInput.RegisterStockInput: ", err)
+		return err
 	}
 
 	return nil
 }
 
-func (s *productService) getBrandIDByName(brandName string) (brandID int64, err resterrors.RestErr) {
+func (s *productService) getBrandIDByName(brandName string) (brandID int64, err error) {
 
 	format.FirstLetterUpperCase(&brandName)
 	brandID, err = s.svc.dm.MySQL().Product().GetBrandByName(brandName)
-	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
 		logger.Error("getColorIDByName.GetBrandByName: ", err)
 		return brandID, err
 	}
@@ -187,11 +187,11 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 	return brandID, nil
 }
 
-func (s *productService) getColorIDByName(colorName string) (colorID int64, err resterrors.RestErr) {
+func (s *productService) getColorIDByName(colorName string) (colorID int64, err error) {
 
 	format.FirstLetterUpperCase(&colorName)
 	colorID, err = s.svc.dm.MySQL().Product().GetColorByName(colorName)
-	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
 		logger.Error("getColorIDByName.GetColorByName: ", err)
 		return colorID, err
 	}
@@ -209,11 +209,11 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 	return colorID, nil
 }
 
-func (s *productService) getGenderIDByName(genderName string) (genderID int64, err resterrors.RestErr) {
+func (s *productService) getGenderIDByName(genderName string) (genderID int64, err error) {
 
 	format.FirstLetterUpperCase(&genderName)
 	genderID, err = s.svc.dm.MySQL().Product().GetGenderByName(genderName)
-	if err != nil && !errors.SQLResultIsEmpty(err.Message()) {
+	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
 		logger.Error("getColorIDByName.GetGenderByName: ", err)
 		return genderID, err
 	}

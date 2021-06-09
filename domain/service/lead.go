@@ -2,10 +2,7 @@ package service
 
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
-	"github.com/diegoclair/sampamodas-system/backend/util/format"
 )
 
 type leadService struct {
@@ -13,51 +10,46 @@ type leadService struct {
 }
 
 //newLeadService return a new instance of the service
-func newLeadService(svc *Service) contract.LeadService {
+func newLeadService(svc *Service) LeadService {
 	return &leadService{
 		svc: svc,
 	}
 }
 
-func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr) {
+func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error) {
 
-	lead, restErr = s.svc.dm.MySQL().Lead().GetLeadByPhoneNumber(phoneNumber)
-	if restErr != nil {
-		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadByPhoneNumber: ", restErr)
-		return lead, restErr
+	lead, err = s.svc.dm.MySQL().Lead().GetLeadByPhoneNumber(phoneNumber)
+	if err != nil {
+		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadByPhoneNumber: ", err)
+		return lead, err
 	}
 
-	lead.LeadAddress, restErr = s.svc.dm.MySQL().Lead().GetLeadAddressByLeadID(lead.ID)
-	if restErr != nil {
-		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadAddressByLeadID: ", restErr)
-		return lead, restErr
+	lead.LeadAddress, err = s.svc.dm.MySQL().Lead().GetLeadAddressByLeadID(lead.ID)
+	if err != nil {
+		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadAddressByLeadID: ", err)
+		return lead, err
 	}
 
 	return lead, nil
 }
 
-func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr) {
+func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, err error) {
 
-	format.FirstLetterUpperCase(&lead.Name)
-	leadID, restErr = s.svc.dm.MySQL().Lead().CreateLead(lead)
-	if restErr != nil {
-		logger.Error("leadService.CreateLead.CreateLead: ", restErr)
-		return leadID, restErr
+	leadID, err = s.svc.dm.MySQL().Lead().CreateLead(lead)
+	if err != nil {
+		logger.Error("leadService.CreateLead.CreateLead: ", err)
+		return leadID, err
 	}
 
 	return leadID, nil
 }
 
-func (s *leadService) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr {
+func (s *leadService) CreateLeadAddress(leadAddress entity.LeadAddress) error {
 
-	format.FirstLetterUpperCase(&leadAddress.Street)
-	format.FirstLetterUpperCase(&leadAddress.Neighborhood)
-	format.FirstLetterUpperCase(&leadAddress.City)
-	format.ToUpperCase(&leadAddress.FederativeUnit)
-	restErr := s.svc.dm.MySQL().Lead().CreateLeadAddress(leadAddress)
-	if restErr != nil {
-		logger.Error("leadService.CreateLeadAddress.CreateLeadAddress: ", restErr)
-		return restErr
+	err := s.svc.dm.MySQL().Lead().CreateLeadAddress(leadAddress)
+	if err != nil {
+		logger.Error("leadService.CreateLeadAddress.CreateLeadAddress: ", err)
+		return err
 	}
 
 	return nil

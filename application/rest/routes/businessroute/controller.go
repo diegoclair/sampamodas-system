@@ -1,17 +1,13 @@
 package businessroute
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/IQ-tech/go-mapper"
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routeutils"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/viewmodel"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,12 +19,12 @@ var (
 
 //Controller holds business handler functions
 type Controller struct {
-	businessService contract.BusinessService
+	businessService service.BusinessService
 	mapper          mapper.Mapper
 }
 
 //NewController to handle requests
-func NewController(businessService contract.BusinessService, mapper mapper.Mapper) *Controller {
+func NewController(businessService service.BusinessService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
 			businessService: businessService,
@@ -44,86 +40,78 @@ func (s *Controller) handleCreateBusiness(c echo.Context) error {
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateBusiness.c.Bind: ", err)
-		restErr := resterrors.NewBadRequestError("Invalid json body")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	business := entity.Business{}
 
-	mapErr := s.mapper.From(input).To(&business)
-	if mapErr != nil {
-		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(mapErr))
-		return c.JSON(restErr.StatusCode(), restErr)
+	err = s.mapper.From(input).To(&business)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	restErr := s.businessService.CreateBusiness(business)
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	err = s.businessService.CreateBusiness(business)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return routeutils.ResponseCreated(c)
 }
 
 func (s *Controller) handleGetBusinesses(c echo.Context) error {
 
-	businesses, restErr := s.businessService.GetBusinesses()
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	businesses, err := s.businessService.GetBusinesses()
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := []viewmodel.Business{}
-	err := s.mapper.From(businesses).To(&response)
+	err = s.mapper.From(businesses).To(&response)
 	if err != nil {
-		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }
 
 func (s *Controller) handleGetBusinessByID(c echo.Context) error {
 
-	businessID, err := strconv.Atoi(c.Param("id"))
+	businessID, err := routeutils.GetAndValidateInt64Param(c, "id", true)
 	if err != nil {
-		restErr := resterrors.NewBadRequestError("id parameter is invalid")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	business, restErr := s.businessService.GetBusinessByID(int64(businessID))
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	business, err := s.businessService.GetBusinessByID(int64(businessID))
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := viewmodel.Business{}
 	err = s.mapper.From(business).To(&response)
 	if err != nil {
-		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }
 
 func (s *Controller) handleGetBusinessByCompanyID(c echo.Context) error {
 
-	companyID, err := strconv.Atoi(c.Param("company_id"))
+	companyID, err := routeutils.GetAndValidateInt64Param(c, "company_id", true)
 	if err != nil {
-		restErr := resterrors.NewBadRequestError("company_id parameter is invalid")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	business, restErr := s.businessService.GetBusinessesByCompanyID(int64(companyID))
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	business, err := s.businessService.GetBusinessesByCompanyID(int64(companyID))
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := []viewmodel.Business{}
 	err = s.mapper.From(business).To(&response)
 	if err != nil {
-		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }

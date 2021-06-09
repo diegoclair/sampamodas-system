@@ -1,16 +1,13 @@
 package leadroute
 
 import (
-	"fmt"
-	"net/http"
 	"sync"
 
 	"github.com/IQ-tech/go-mapper"
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routeutils"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/viewmodel"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,12 +19,12 @@ var (
 
 //Controller holds lead handler functions
 type Controller struct {
-	leadService contract.LeadService
+	leadService service.LeadService
 	mapper      mapper.Mapper
 }
 
 //NewController to handle requests
-func NewController(leadService contract.LeadService, mapper mapper.Mapper) *Controller {
+func NewController(leadService service.LeadService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
 			leadService: leadService,
@@ -43,28 +40,31 @@ func (s *Controller) handleCreateLead(c echo.Context) error {
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateLead.c.Bind: ", err)
-		restErr := resterrors.NewBadRequestError("Invalid json body")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
+	}
+
+	err = input.Validate()
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	lead := entity.Lead{}
 
 	err = s.mapper.From(input).To(&lead)
 	if err != nil {
-		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	leadID, restErr := s.leadService.CreateLead(lead)
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	leadID, err := s.leadService.CreateLead(lead)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	response := viewmodel.CreateLeadResponse{}
-	response.LeadID = leadID
+	response := viewmodel.CreateLeadResponse{
+		LeadID: leadID,
+	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }
 
 func (s *Controller) handleCreateLeadAddress(c echo.Context) error {
@@ -73,42 +73,46 @@ func (s *Controller) handleCreateLeadAddress(c echo.Context) error {
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateLead.c.Bind: ", err)
-		restErr := resterrors.NewBadRequestError("Invalid json body")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
+	}
+
+	err = input.Validate()
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	leadAddress := entity.LeadAddress{}
 
 	err = s.mapper.From(input).To(&leadAddress)
 	if err != nil {
-		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	restErr := s.leadService.CreateLeadAddress(leadAddress)
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	err = s.leadService.CreateLeadAddress(leadAddress)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return routeutils.ResponseCreated(c)
 }
 
 func (s *Controller) handleGetLeadByPhoneNumber(c echo.Context) error {
 
-	phoneNumber := c.Param("phone_number")
+	phoneNumber, err := routeutils.GetAndValidateStringParam(c, "phone_number", true)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
+	}
 
 	lead, err := s.leadService.GetLeadByPhoneNumber(phoneNumber)
 	if err != nil {
-		return c.JSON(err.StatusCode(), err)
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := viewmodel.Lead{}
-	mapErr := s.mapper.From(lead).To(&response)
-	if mapErr != nil {
-		err = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(mapErr))
-		return c.JSON(err.StatusCode(), err)
+	err = s.mapper.From(lead).To(&response)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }

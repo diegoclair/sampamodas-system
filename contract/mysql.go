@@ -1,7 +1,6 @@
 package contract
 
 import (
-	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -24,54 +23,54 @@ type MysqlTransaction interface {
 
 // BusinessRepo defines the data set for business repo
 type BusinessRepo interface {
-	CreateBusiness(company entity.Business) resterrors.RestErr
-	GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr)
-	GetBusinessByID(businessID int64) (businesses entity.Business, restErr resterrors.RestErr)
-	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr)
+	CreateBusiness(company entity.Business) error
+	GetBusinesses() (businesses []entity.Business, err error)
+	GetBusinessByID(businessID int64) (businesses entity.Business, err error)
+	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, err error)
 }
 
 // CompanyRepo defines the data set for company repo
 type CompanyRepo interface {
-	CreateCompany(company entity.Company) resterrors.RestErr
-	GetCompanies() (companies []entity.Company, restErr resterrors.RestErr)
-	GetCompanyByID(companyID int64) (company entity.Company, restErr resterrors.RestErr)
+	CreateCompany(company entity.Company) error
+	GetCompanies() (companies []entity.Company, err error)
+	GetCompanyByID(companyID int64) (company entity.Company, err error)
 }
 
 // LeadRepo defines the data set for lead
 type LeadRepo interface {
-	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr)
-	GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, restErr resterrors.RestErr)
-	CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr)
-	CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr
+	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error)
+	GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, err error)
+	CreateLead(lead entity.Lead) (leadID int64, err error)
+	CreateLeadAddress(leadAddress entity.LeadAddress) error
 }
 
 // ProductRepo defines the data set for product repo
 type ProductRepo interface {
-	CreateProduct(product entity.Product) (productID int64, restErr resterrors.RestErr)
-	GetProducts() (products []entity.Product, restErr resterrors.RestErr)
-	GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr)
-	GetProductIDByProductStockID(producStockID int64) (productID int64, restErr resterrors.RestErr)
-	RegisterStockInput(productStockID, quantity int64) resterrors.RestErr
+	CreateProduct(product entity.Product) (productID int64, err error)
+	GetProducts() (products []entity.Product, err error)
+	GetProductByID(productID int64) (product entity.Product, err error)
+	GetProductIDByProductStockID(producStockID int64) (productID int64, err error)
+	RegisterStockInput(productStockID, quantity int64) error
 
-	GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, restErr resterrors.RestErr)
-	UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) resterrors.RestErr
+	GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, err error)
+	UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) error
 
-	CreateProductStock(productID int64, product entity.ProductStock) (productStockID int64, restErr resterrors.RestErr)
-	GetStockProductByProductID(productID int64) (product []entity.ProductStock, restErr resterrors.RestErr)
+	CreateProductStock(productID int64, product entity.ProductStock) (productStockID int64, err error)
+	GetStockProductByProductID(productID int64) (product []entity.ProductStock, err error)
 
-	CreateBrand(brandName string) (brandID int64, restErr resterrors.RestErr)
-	GetBrandByName(brandName string) (brandID int64, restErr resterrors.RestErr)
+	CreateBrand(brandName string) (brandID int64, err error)
+	GetBrandByName(brandName string) (brandID int64, err error)
 
-	CreateColor(colorName string) (colorID int64, restErr resterrors.RestErr)
-	GetColorByName(colorName string) (colorID int64, restErr resterrors.RestErr)
+	CreateColor(colorName string) (colorID int64, err error)
+	GetColorByName(colorName string) (colorID int64, err error)
 
-	CreateGender(genderName string) (genderID int64, restErr resterrors.RestErr)
-	GetGenderByName(genderName string) (genderID int64, restErr resterrors.RestErr)
+	CreateGender(genderName string) (genderID int64, err error)
+	GetGenderByName(genderName string) (genderID int64, err error)
 }
 
 // SaleRepo defines the data set for sale
 type SaleRepo interface {
-	CreateSale(sale entity.Sale) (saleID int64, restErr resterrors.RestErr)
-	CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.RestErr
-	UpdateSaleTotalPrice(saleID int64, totalPrice float64) resterrors.RestErr
+	CreateSale(sale entity.Sale) (saleID int64, err error)
+	CreateSaleProduct(saleProduct entity.SaleProduct) error
+	UpdateSaleTotalPrice(saleID int64, totalPrice float64) error
 }

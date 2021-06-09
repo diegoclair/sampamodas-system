@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
-	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -17,7 +16,7 @@ func newBusinessRepo(db connection) *businessRepo {
 	}
 }
 
-func (s *businessRepo) CreateBusiness(business entity.Business) resterrors.RestErr {
+func (s *businessRepo) CreateBusiness(business entity.Business) error {
 
 	query := `
 		INSERT INTO tab_business (
@@ -45,7 +44,7 @@ func (s *businessRepo) CreateBusiness(business entity.Business) resterrors.RestE
 	return nil
 }
 
-func (s *businessRepo) GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr) {
+func (s *businessRepo) GetBusinesses() (businesses []entity.Business, err error) {
 
 	query := `
 		SELECT
@@ -83,7 +82,7 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, restErr re
 	return businesses, nil
 }
 
-func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Business, restErr resterrors.RestErr) {
+func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Business, err error) {
 
 	query := `
 		SELECT
@@ -118,7 +117,7 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 	return business, nil
 }
 
-func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr) {
+func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, err error) {
 
 	query := `
 		SELECT

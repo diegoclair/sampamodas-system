@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
-	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -16,7 +15,7 @@ func newSaleRepo(db connection) *saleRepo {
 	}
 }
 
-func (s *saleRepo) CreateSale(sale entity.Sale) (saleID int64, restErr resterrors.RestErr) {
+func (s *saleRepo) CreateSale(sale entity.Sale) (saleID int64, err error) {
 	query := `
 		INSERT INTO tab_sale (
 			lead_id, 
@@ -57,7 +56,7 @@ func (s *saleRepo) CreateSale(sale entity.Sale) (saleID int64, restErr resterror
 	return saleID, nil
 }
 
-func (s *saleRepo) CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.RestErr {
+func (s *saleRepo) CreateSaleProduct(saleProduct entity.SaleProduct) error {
 	query := `
 		INSERT INTO tab_sale_product (
 			sale_id, 
@@ -92,7 +91,7 @@ func (s *saleRepo) CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.
 	return nil
 }
 
-func (s *saleRepo) UpdateSaleTotalPrice(saleID int64, totalPrice float64) resterrors.RestErr {
+func (s *saleRepo) UpdateSaleTotalPrice(saleID int64, totalPrice float64) error {
 	query := `
 		UPDATE 	tab_sale
 		SET 	total_price		= 	?
