@@ -22,6 +22,6 @@ func NewRouter(ctrl *Controller, router *echo.Echo) *BusinessRouter {
 func (r *BusinessRouter) RegisterRoutes() {
 	r.router.POST("/business/", r.ctrl.handleCreateBusiness)
 	r.router.GET("/businesses/", r.ctrl.handleGetBusinesses)
-	r.router.GET("/business/:id/", r.ctrl.handleGetBusinessByID)
-	r.router.GET("/businesses/:company_id", r.ctrl.handleGetBusinessByCompanyID)
+	r.router.GET("/business/:uuid/", r.ctrl.handleGetBusinessByID)
+	r.router.GET("/businesses/:company_uuid/", r.ctrl.handleGetBusinessByCompanyID)
 }

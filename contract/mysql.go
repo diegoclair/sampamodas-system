@@ -25,15 +25,15 @@ type MysqlTransaction interface {
 type BusinessRepo interface {
 	CreateBusiness(company entity.Business) error
 	GetBusinesses() (businesses []entity.Business, err error)
-	GetBusinessByID(businessID int64) (businesses entity.Business, err error)
-	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, err error)
+	GetBusinessByUUID(businessUUID string) (businesses entity.Business, err error)
+	GetBusinessesByCompanyUUID(companyUUID string) (businesses []entity.Business, err error)
 }
 
 // CompanyRepo defines the data set for company repo
 type CompanyRepo interface {
 	CreateCompany(company entity.Company) error
 	GetCompanies() (companies []entity.Company, err error)
-	GetCompanyByID(companyID int64) (company entity.Company, err error)
+	GetCompanyByUUID(companyUUID string) (company entity.Company, err error)
 }
 
 // LeadRepo defines the data set for lead

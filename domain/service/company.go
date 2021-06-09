@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/twinj/uuid"
 )
 
 type companyService struct {
@@ -27,11 +28,11 @@ func (s *companyService) GetCompanies() (companies []entity.Company, err error) 
 	return companies, nil
 }
 
-func (s *companyService) GetCompanyByID(companyID int64) (company entity.Company, err error) {
+func (s *companyService) GetCompanyByUUID(companyUUID string) (company entity.Company, err error) {
 
-	company, err = s.svc.dm.MySQL().Company().GetCompanyByID(companyID)
+	company, err = s.svc.dm.MySQL().Company().GetCompanyByUUID(companyUUID)
 	if err != nil {
-		logger.Error("companyService.GetCompanies.GetCompanyByID: ", err)
+		logger.Error("companyService.GetCompanies.GetCompanyByUUID: ", err)
 		return company, err
 	}
 
@@ -40,6 +41,7 @@ func (s *companyService) GetCompanyByID(companyID int64) (company entity.Company
 
 func (s *companyService) CreateCompany(company entity.Company) error {
 
+	company.UUID = uuid.NewV4().String()
 	err := s.svc.dm.MySQL().Company().CreateCompany(company)
 	if err != nil {
 		logger.Error("companyService.GetCompanies.CreateCompany: ", err)

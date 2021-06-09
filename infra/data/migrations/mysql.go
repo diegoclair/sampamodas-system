@@ -12,6 +12,7 @@ var (
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_company (
 					company_id INT NOT NULL AUTO_INCREMENT,
+					company_uuid CHAR(36) NOT NULL,
 					document_number VARCHAR(14) NOT NULL,
 					legal_name VARCHAR(45) NOT NULL,
 					commercial_name VARCHAR(45) NOT NULL,
@@ -29,6 +30,7 @@ var (
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_business (
 					business_id INT NOT NULL AUTO_INCREMENT,
+					business_uuid CHAR(36) NOT NULL,
 					company_id INT NOT NULL,
 					name VARCHAR(45) NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -114,7 +116,7 @@ var (
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (product_id),
 					UNIQUE INDEX id_UNIQUE (product_id ASC) VISIBLE,
-					INDEX fk_tab_products_tab_business1_idx (business_id ASC) VISIBLE,
+					INDEX fk_tab_product_tab_business1_idx (business_id ASC) VISIBLE,
 					INDEX fk_tab_product_tab_brand1_idx (brand_id ASC) VISIBLE,
 					INDEX fk_tab_product_tab_gender1_idx (gender_id ASC) VISIBLE,
 					INDEX fk_tab_product_tab_supplier1_idx (supplier_id ASC) VISIBLE,
@@ -147,15 +149,23 @@ var (
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_lead (
 					lead_id INT NOT NULL AUTO_INCREMENT,
+					lead_uuid CHAR(36) NOT NULL,
 					name VARCHAR(45) NULL,
 					email VARCHAR(45) NULL,
 					phone_number VARCHAR(45) NOT NULL,
 					instagram VARCHAR(45) NULL,
+					business_id INT NOT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (lead_id, phone_number),
 					UNIQUE INDEX id_UNIQUE (lead_id ASC) VISIBLE,
-					UNIQUE INDEX phone_number_UNIQUE (phone_number ASC) VISIBLE)
+					UNIQUE INDEX phone_number_UNIQUE (phone_number ASC) VISIBLE),
+					INDEX fk_tab_lead_tab_business1_idx (business_id ASC) VISIBLE,
+					CONSTRAINT fk_tab_lead_tab_business1
+					FOREIGN KEY (business_id)
+					REFERENCES tab_business (business_id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION,
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
 		},
@@ -194,6 +204,7 @@ var (
 			Script: `
 				CREATE TABLE IF NOT EXISTS tab_sale (
 					sale_id INT NOT NULL AUTO_INCREMENT,
+					sale_uuid CHAR(36) NOT NULL,
 					lead_id INT NOT NULL,
 					total_price DECIMAL(7,2) NOT NULL DEFAULT 0.00,
 					freight DECIMAL(7,2) NOT NULL,

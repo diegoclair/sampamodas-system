@@ -76,12 +76,12 @@ func (s *Controller) handleGetBusinesses(c echo.Context) error {
 
 func (s *Controller) handleGetBusinessByID(c echo.Context) error {
 
-	businessID, err := routeutils.GetAndValidateInt64Param(c, "id", true)
+	businessUUID, err := routeutils.GetAndValidateStringParam(c, "uuid", true)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}
 
-	business, err := s.businessService.GetBusinessByID(int64(businessID))
+	business, err := s.businessService.GetBusinessByUUID(businessUUID)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}
@@ -97,12 +97,12 @@ func (s *Controller) handleGetBusinessByID(c echo.Context) error {
 
 func (s *Controller) handleGetBusinessByCompanyID(c echo.Context) error {
 
-	companyID, err := routeutils.GetAndValidateInt64Param(c, "company_id", true)
+	companyUUID, err := routeutils.GetAndValidateStringParam(c, "company_uuid", true)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}
 
-	business, err := s.businessService.GetBusinessesByCompanyID(int64(companyID))
+	business, err := s.businessService.GetBusinessesByCompanyUUID(companyUUID)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}
