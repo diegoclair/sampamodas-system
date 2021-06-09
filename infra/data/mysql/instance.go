@@ -81,7 +81,7 @@ func Instance() (contract.MySQLRepo, error) {
 		}
 	})
 
-	return conn, nil
+	return conn, connErr
 }
 
 // Begin starts a transaction
@@ -94,32 +94,26 @@ func (c *mysqlConn) Begin() (contract.MysqlTransaction, error) {
 	return newTransaction(tx), nil
 }
 
-// Close closes the db connection
 func (c *mysqlConn) Close() (err error) {
 	return c.db.Close()
 }
 
-//Business returns the business set
 func (c *mysqlConn) Business() contract.BusinessRepo {
 	return newBusinessRepo(c.db)
 }
 
-//Company returns the company set
 func (c *mysqlConn) Company() contract.CompanyRepo {
 	return newCompanyRepo(c.db)
 }
 
-//Lead returns the lead set
 func (c *mysqlConn) Lead() contract.LeadRepo {
 	return newLeadRepo(c.db)
 }
 
-//Product returns the product set
 func (c *mysqlConn) Product() contract.ProductRepo {
 	return newProductRepo(c.db)
 }
 
-//Sale returns the sale set
 func (c *mysqlConn) Sale() contract.SaleRepo {
 	return newSaleRepo(c.db)
 }
