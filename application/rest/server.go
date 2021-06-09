@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/diegoclair/go_utils-lib/logger"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
 	"github.com/diegoclair/sampamodas-system/backend/application/factory"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/businessroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/companyroute"

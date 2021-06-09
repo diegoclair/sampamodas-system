@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/GuiaBolso/darwin"
-	"github.com/diegoclair/go_utils-lib/logger"
+	"github.com/diegoclair/go_utils-lib/v2/logger"
 	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/infra/data/migrations"
 	"github.com/diegoclair/sampamodas-system/backend/util/config"
