@@ -12,82 +12,82 @@ import (
 
 type saleService struct {
 	svc            *Service
-	productService contract.ProductService
+	productService ProductService
 }
 
-func newSaleService(svc *Service, productService contract.ProductService) contract.SaleService {
+func newSaleService(svc *Service, productService ProductService) SaleService {
 	return &saleService{
 		svc:            svc,
 		productService: productService,
 	}
 }
 
-func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, restErr resterrors.RestErr) {
+func (s *saleService) CreateSale(sale entity.Sale) (saleID int64, err error) {
 
-	tx, txErr := s.svc.dm.MySQL().Begin()
-	if txErr != nil {
-		logger.Error("saleService.CreateSale.Begin: ", txErr)
+	tx, err := s.svc.dm.MySQL().Begin()
+	if err != nil {
+		logger.Error("saleService.CreateSale.Begin: ", err)
 		return saleID, resterrors.NewInternalServerError("Database transaction error")
 	}
 	defer tx.Rollback()
 
-	saleID, restErr = tx.Sale().CreateSale(sale)
-	if restErr != nil {
-		logger.Error("saleService.CreateSale.CreateSale", restErr)
-		return saleID, restErr
+	saleID, err = tx.Sale().CreateSale(sale)
+	if err != nil {
+		logger.Error("saleService.CreateSale.CreateSale", err)
+		return saleID, err
 	}
 
 	var totalPrice float64
 	for i := range sale.SaleProduct {
 
-		product, restErr := s.productService.GetProductByProductStockID(sale.SaleProduct[i].ProductStockID)
-		if restErr != nil && errors.SQLResultIsEmpty(restErr.Message()) {
-			logger.Error("ProductStockID is invalid", restErr)
+		product, err := s.productService.GetProductByProductStockID(sale.SaleProduct[i].ProductStockID)
+		if err != nil && errors.SQLResultIsEmpty(err.Error()) {
+			logger.Error("ProductStockID is invalid", err)
 			return saleID, resterrors.NewBadRequestError("O ID do estoque do produto é inválido, contate o administrador.")
 
 		}
-		if restErr != nil {
-			logger.Error("saleService.CreateSale.GetProductByProductStockID", restErr)
-			return saleID, restErr
+		if err != nil {
+			logger.Error("saleService.CreateSale.GetProductByProductStockID", err)
+			return saleID, err
 		}
 
-		restErr = s.removeStockAvailableQuantity(sale.SaleProduct[i].ProductStockID, sale.SaleProduct[i].Quantity, tx)
-		if restErr != nil {
-			return saleID, restErr
+		err = s.removeStockAvailableQuantity(sale.SaleProduct[i].ProductStockID, sale.SaleProduct[i].Quantity, tx)
+		if err != nil {
+			return saleID, err
 		}
 		sale.SaleProduct[i].Price = product.Price
 		sale.SaleProduct[i].SaleID = saleID
 
-		restErr = tx.Sale().CreateSaleProduct(sale.SaleProduct[i])
-		if restErr != nil {
-			logger.Error("saleService.CreateSale.CreateSaleProduct", restErr)
-			return saleID, restErr
+		err = tx.Sale().CreateSaleProduct(sale.SaleProduct[i])
+		if err != nil {
+			logger.Error("saleService.CreateSale.CreateSaleProduct", err)
+			return saleID, err
 		}
 
 		totalPrice += product.Price
 	}
 
-	restErr = tx.Sale().UpdateSaleTotalPrice(saleID, totalPrice)
-	if restErr != nil {
-		logger.Error("saleService.CreateSale.UpdateSaleTotalPrice", restErr)
-		return saleID, restErr
+	err = tx.Sale().UpdateSaleTotalPrice(saleID, totalPrice)
+	if err != nil {
+		logger.Error("saleService.CreateSale.UpdateSaleTotalPrice", err)
+		return saleID, err
 	}
 
-	txErr = tx.Commit()
-	if txErr != nil {
-		logger.Error("saleService.CreateSale.Commit: ", txErr)
+	err = tx.Commit()
+	if err != nil {
+		logger.Error("saleService.CreateSale.Commit: ", err)
 		return saleID, resterrors.NewInternalServerError("Database transaction commit error")
 	}
 
 	return saleID, nil
 }
 
-func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) resterrors.RestErr {
+func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) error {
 
-	actualAvailableQuantity, restErr := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
-	if restErr != nil && !errors.SQLResultIsEmpty(restErr.Message()) {
-		logger.Error("saleService.removeStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", restErr)
-		return restErr
+	actualAvailableQuantity, err := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
+	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
+		logger.Error("saleService.removeStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", err)
+		return err
 	}
 
 	if quantity > actualAvailableQuantity {
@@ -96,23 +96,23 @@ func (s *saleService) removeStockAvailableQuantity(productStockID, quantity int6
 	}
 	availableQuantity := actualAvailableQuantity - quantity
 
-	restErr = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
-	if restErr != nil {
-		logger.Error("saleService.removeStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", restErr)
-		return restErr
+	err = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
+	if err != nil {
+		logger.Error("saleService.removeStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", err)
+		return err
 	}
 
 	return nil
 }
 
-func (s *saleService) CreateSaleProduct(saleProduct entity.SaleProduct) resterrors.RestErr {
+func (s *saleService) CreateSaleProduct(saleProduct entity.SaleProduct) error {
 	return nil
 }
 
-func (s *saleService) GetSales() (sales []entity.Sale, restErr resterrors.RestErr) {
+func (s *saleService) GetSales() (sales []entity.Sale, err error) {
 	return sales, nil
 }
 
-func (s *saleService) GetSaleByID(saleID int64) (sale entity.Sale, restErr resterrors.RestErr) {
+func (s *saleService) GetSaleByID(saleID int64) (sale entity.Sale, err error) {
 	return sale, nil
 }

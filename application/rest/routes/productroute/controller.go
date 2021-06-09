@@ -1,17 +1,13 @@
 package productroute
 
 import (
-	"fmt"
-	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/IQ-tech/go-mapper"
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routeutils"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/viewmodel"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 
 	"github.com/labstack/echo/v4"
 )
@@ -23,12 +19,12 @@ var (
 
 //Controller holds product handler functions
 type Controller struct {
-	productService contract.ProductService
+	productService service.ProductService
 	mapper         mapper.Mapper
 }
 
 //NewController to handle requests
-func NewController(productService contract.ProductService, mapper mapper.Mapper) *Controller {
+func NewController(productService service.ProductService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
 			productService: productService,
@@ -44,17 +40,14 @@ func (s *Controller) handleCreateProduct(c echo.Context) error {
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateProduct.c.Bind: ", err)
-		restErr := resterrors.NewBadRequestError("Invalid json body")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	product := entity.Product{}
 
 	err = s.mapper.From(input).To(&product)
 	if err != nil {
-		restErr := resterrors.NewInternalServerError("Error to do the mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	product.Brand.Name = input.BrandName
@@ -63,50 +56,47 @@ func (s *Controller) handleCreateProduct(c echo.Context) error {
 		product.ProductStock[i].Color.Name = input.ProductStock[i].Color
 	}
 
-	restErr := s.productService.CreateProduct(product)
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	err = s.productService.CreateProduct(product)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return routeutils.ResponseCreated(c)
 }
 
 func (s *Controller) handleGetProducts(c echo.Context) error {
 
-	products, restErr := s.productService.GetProducts()
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	products, err := s.productService.GetProducts()
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := []viewmodel.Product{}
-	err := s.mapper.From(products).To(&response)
+	err = s.mapper.From(products).To(&response)
 	if err != nil {
-		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }
 
 func (s *Controller) handleGetProductByID(c echo.Context) error {
 
-	productID, err := strconv.Atoi(c.Param("id"))
+	productID, err := routeutils.GetAndValidateInt64Param(c, "id", true)
 	if err != nil {
-		restErr := resterrors.NewBadRequestError("id parameter is invalid")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	product, restErr := s.productService.GetProductByID(int64(productID))
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	product, err := s.productService.GetProductByID(int64(productID))
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := viewmodel.Product{}
 	err = s.mapper.From(product).To(&response)
 	if err != nil {
-		restErr = resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }

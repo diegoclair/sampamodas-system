@@ -2,8 +2,6 @@ package service
 
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -12,40 +10,40 @@ type companyService struct {
 }
 
 //newCompanyService return a new instance of the service
-func newCompanyService(svc *Service) contract.CompanyService {
+func newCompanyService(svc *Service) CompanyService {
 	return &companyService{
 		svc: svc,
 	}
 }
 
-func (s *companyService) GetCompanies() (companies []entity.Company, restErr resterrors.RestErr) {
+func (s *companyService) GetCompanies() (companies []entity.Company, err error) {
 
-	companies, restErr = s.svc.dm.MySQL().Company().GetCompanies()
-	if restErr != nil {
-		logger.Error("companyService.GetCompanies.GetCompanies: ", restErr)
-		return companies, restErr
+	companies, err = s.svc.dm.MySQL().Company().GetCompanies()
+	if err != nil {
+		logger.Error("companyService.GetCompanies.GetCompanies: ", err)
+		return companies, err
 	}
 
 	return companies, nil
 }
 
-func (s *companyService) GetCompanyByID(companyID int64) (company entity.Company, restErr resterrors.RestErr) {
+func (s *companyService) GetCompanyByID(companyID int64) (company entity.Company, err error) {
 
-	company, restErr = s.svc.dm.MySQL().Company().GetCompanyByID(companyID)
-	if restErr != nil {
-		logger.Error("companyService.GetCompanies.GetCompanyByID: ", restErr)
-		return company, restErr
+	company, err = s.svc.dm.MySQL().Company().GetCompanyByID(companyID)
+	if err != nil {
+		logger.Error("companyService.GetCompanies.GetCompanyByID: ", err)
+		return company, err
 	}
 
 	return company, nil
 }
 
-func (s *companyService) CreateCompany(company entity.Company) resterrors.RestErr {
+func (s *companyService) CreateCompany(company entity.Company) error {
 
-	restErr := s.svc.dm.MySQL().Company().CreateCompany(company)
-	if restErr != nil {
-		logger.Error("companyService.GetCompanies.CreateCompany: ", restErr)
-		return restErr
+	err := s.svc.dm.MySQL().Company().CreateCompany(company)
+	if err != nil {
+		logger.Error("companyService.GetCompanies.CreateCompany: ", err)
+		return err
 	}
 
 	return nil

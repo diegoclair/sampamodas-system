@@ -2,8 +2,6 @@ package service
 
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -12,50 +10,50 @@ type businessService struct {
 }
 
 //newBusinessService return a new instance of the service
-func newBusinessService(svc *Service) contract.BusinessService {
+func newBusinessService(svc *Service) BusinessService {
 	return &businessService{
 		svc: svc,
 	}
 }
 
-func (s *businessService) GetBusinesses() (businesses []entity.Business, restErr resterrors.RestErr) {
+func (s *businessService) GetBusinesses() (businesses []entity.Business, err error) {
 
-	businesses, restErr = s.svc.dm.MySQL().Business().GetBusinesses()
-	if restErr != nil {
-		logger.Error("businessService.GetBusinesses.GetBusinesses: ", restErr)
-		return businesses, restErr
+	businesses, err = s.svc.dm.MySQL().Business().GetBusinesses()
+	if err != nil {
+		logger.Error("businessService.GetBusinesses.GetBusinesses: ", err)
+		return businesses, err
 	}
 
 	return businesses, nil
 }
 
-func (s *businessService) GetBusinessByID(businessID int64) (business entity.Business, restErr resterrors.RestErr) {
+func (s *businessService) GetBusinessByID(businessID int64) (business entity.Business, err error) {
 
-	business, restErr = s.svc.dm.MySQL().Business().GetBusinessByID(businessID)
-	if restErr != nil {
-		logger.Error("businessService.GetBusinesses.GetBusinessByID: ", restErr)
-		return business, restErr
+	business, err = s.svc.dm.MySQL().Business().GetBusinessByID(businessID)
+	if err != nil {
+		logger.Error("businessService.GetBusinesses.GetBusinessByID: ", err)
+		return business, err
 	}
 
 	return business, nil
 }
 
-func (s *businessService) GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, restErr resterrors.RestErr) {
-	businesses, restErr = s.svc.dm.MySQL().Business().GetBusinessesByCompanyID(companyID)
-	if restErr != nil {
-		logger.Error("businessService.GetBusinesses.GetBusinessesByCompanyID: ", restErr)
-		return businesses, restErr
+func (s *businessService) GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, err error) {
+	businesses, err = s.svc.dm.MySQL().Business().GetBusinessesByCompanyID(companyID)
+	if err != nil {
+		logger.Error("businessService.GetBusinesses.GetBusinessesByCompanyID: ", err)
+		return businesses, err
 	}
 
 	return businesses, nil
 }
 
-func (s *businessService) CreateBusiness(business entity.Business) resterrors.RestErr {
+func (s *businessService) CreateBusiness(business entity.Business) error {
 
-	restErr := s.svc.dm.MySQL().Business().CreateBusiness(business)
-	if restErr != nil {
-		logger.Error("businessService.GetBusinesses.CreateBusiness: ", restErr)
-		return restErr
+	err := s.svc.dm.MySQL().Business().CreateBusiness(business)
+	if err != nil {
+		logger.Error("businessService.GetBusinesses.CreateBusiness: ", err)
+		return err
 	}
 
 	return nil

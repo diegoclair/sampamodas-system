@@ -1,6 +1,7 @@
 package viewmodel
 
-// Lead viewmodel
+import "github.com/diegoclair/sampamodas-system/backend/util/format"
+
 type Lead struct {
 	LeadID      int64         `json:"lead_id,omitempty"`
 	Name        string        `json:"name,omitempty"`
@@ -10,7 +11,11 @@ type Lead struct {
 	LeadAddress []LeadAddress `json:"lead_address,omitempty"`
 }
 
-// LeadAddress viewmodel
+func (l *Lead) Validate() error {
+	format.FirstLetterUpperCase(&l.Name)
+	return nil
+}
+
 type LeadAddress struct {
 	LeadAddressID  int64  `json:"lead_address_id,omitempty"`
 	LeadID         int64  `json:"lead_id,omitempty"`
@@ -22,6 +27,14 @@ type LeadAddress struct {
 	City           string `json:"city,omitempty"`
 	FederativeUnit string `json:"federative_unit,omitempty"`
 	ZipCode        string `json:"zip_code,omitempty"`
+}
+
+func (l *LeadAddress) Validate() error {
+	format.FirstLetterUpperCase(&l.Street)
+	format.FirstLetterUpperCase(&l.Neighborhood)
+	format.FirstLetterUpperCase(&l.City)
+	format.ToUpperCase(&l.FederativeUnit)
+	return nil
 }
 
 // CreateLeadResponse viewmodel

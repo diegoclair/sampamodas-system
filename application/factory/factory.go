@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/IQ-tech/go-mapper"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 	"github.com/diegoclair/sampamodas-system/backend/infra/data"
 	"github.com/diegoclair/sampamodas-system/backend/util/config"
@@ -15,11 +14,11 @@ import (
 type Services struct {
 	Cfg             *config.EnvironmentVariables
 	Mapper          mapper.Mapper
-	BusinessService contract.BusinessService
-	CompanyService  contract.CompanyService
-	LeadService     contract.LeadService
-	ProductService  contract.ProductService
-	SaleService     contract.SaleService
+	BusinessService service.BusinessService
+	CompanyService  service.CompanyService
+	LeadService     service.LeadService
+	ProductService  service.ProductService
+	SaleService     service.SaleService
 }
 
 var (
@@ -41,16 +40,14 @@ func GetDomainServices() *Services {
 		svc := service.New(data, cfg)
 		svm := service.NewServiceManager()
 		mapper := mapper.New()
-
-		instance = &Services{
-			Cfg:             cfg,
-			Mapper:          mapper,
-			BusinessService: svm.BusinessService(svc),
-			CompanyService:  svm.CompanyService(svc),
-			LeadService:     svm.LeadService(svc),
-			ProductService:  svm.ProductService(svc),
-			SaleService:     svm.SaleService(svc, instance.ProductService),
-		}
+		instance = &Services{}
+		instance.Cfg = cfg
+		instance.Mapper = mapper
+		instance.BusinessService = svm.BusinessService(svc)
+		instance.CompanyService = svm.CompanyService(svc)
+		instance.LeadService = svm.LeadService(svc)
+		instance.ProductService = svm.ProductService(svc)
+		instance.SaleService = svm.SaleService(svc, instance.ProductService)
 
 	})
 

@@ -1,16 +1,13 @@
 package saleroute
 
 import (
-	"fmt"
-	"net/http"
 	"sync"
 
 	"github.com/IQ-tech/go-mapper"
-	"github.com/diegoclair/go_utils-lib/logger"
-	"github.com/diegoclair/go_utils-lib/resterrors"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routeutils"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/viewmodel"
-	"github.com/diegoclair/sampamodas-system/backend/contract"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/diegoclair/sampamodas-system/backend/domain/service"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,12 +19,12 @@ var (
 
 //Controller holds sales handler functions
 type Controller struct {
-	saleService contract.SaleService
+	saleService service.SaleService
 	mapper      mapper.Mapper
 }
 
 //NewController to handle requests
-func NewController(saleService contract.SaleService, mapper mapper.Mapper) *Controller {
+func NewController(saleService service.SaleService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
 			saleService: saleService,
@@ -43,28 +40,25 @@ func (s *Controller) handleCreateSale(c echo.Context) error {
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateSale.c.Bind: ", err)
-		restErr := resterrors.NewBadRequestError("Invalid json body")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	sale := entity.Sale{}
 
 	err = s.mapper.From(input).To(&sale)
 	if err != nil {
-		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	saleID, restErr := s.saleService.CreateSale(sale)
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	saleID, err := s.saleService.CreateSale(sale)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	response := viewmodel.CreateSaleResponse{}
 	response.SaleID = saleID
 
-	return c.JSON(http.StatusOK, response)
+	return routeutils.ResponseAPIOK(c, response)
 }
 
 func (s *Controller) handleSaleProduct(c echo.Context) error {
@@ -73,23 +67,20 @@ func (s *Controller) handleSaleProduct(c echo.Context) error {
 
 	err := c.Bind(&input)
 	if err != nil {
-		logger.Error("handleCreateLead.c.Bind: ", err)
-		restErr := resterrors.NewBadRequestError("Invalid json body")
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
 	saleProduct := entity.SaleProduct{}
 
 	err = s.mapper.From(input).To(&saleProduct)
 	if err != nil {
-		restErr := resterrors.NewInternalServerError("Error to mapper: " + fmt.Sprint(err))
-		return c.JSON(restErr.StatusCode(), restErr)
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	restErr := s.saleService.CreateSaleProduct(saleProduct)
-	if restErr != nil {
-		return c.JSON(restErr.StatusCode(), restErr)
+	err = s.saleService.CreateSaleProduct(saleProduct)
+	if err != nil {
+		return routeutils.HandleAPIError(c, err)
 	}
 
-	return c.NoContent(http.StatusNoContent)
+	return routeutils.ResponseCreated(c)
 }

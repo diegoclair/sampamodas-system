@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
-	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -38,7 +37,7 @@ var queryProduct string = `
 		ON 		tb.brand_id		= tp.brand_id
 `
 
-func (s *productRepo) CreateProduct(product entity.Product) (productID int64, restErr resterrors.RestErr) {
+func (s *productRepo) CreateProduct(product entity.Product) (productID int64, err error) {
 
 	query := `
 		INSERT INTO tab_product (
@@ -79,7 +78,7 @@ func (s *productRepo) CreateProduct(product entity.Product) (productID int64, re
 	return productID, nil
 }
 
-func (s *productRepo) GetProducts() (products []entity.Product, restErr resterrors.RestErr) {
+func (s *productRepo) GetProducts() (products []entity.Product, err error) {
 
 	query := queryProduct
 
@@ -116,7 +115,7 @@ func (s *productRepo) GetProducts() (products []entity.Product, restErr resterro
 	return products, nil
 }
 
-func (s *productRepo) GetProductByID(productID int64) (product entity.Product, restErr resterrors.RestErr) {
+func (s *productRepo) GetProductByID(productID int64) (product entity.Product, err error) {
 
 	query := queryProduct + `
 		WHERE  	tp.product_id 			= ?
@@ -151,7 +150,7 @@ func (s *productRepo) GetProductByID(productID int64) (product entity.Product, r
 	return product, nil
 }
 
-func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (productID int64, restErr resterrors.RestErr) {
+func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (productID int64, err error) {
 
 	query := `
 		SELECT 	tps.product_id 
@@ -179,7 +178,7 @@ func (s *productRepo) GetProductIDByProductStockID(producStockID int64) (product
 	return productID, nil
 }
 
-func (s *productRepo) RegisterStockInput(productStockID, quantity int64) resterrors.RestErr {
+func (s *productRepo) RegisterStockInput(productStockID, quantity int64) error {
 	query := `
 		INSERT INTO tab_stock_input (
 			product_stock_id,
@@ -206,7 +205,7 @@ func (s *productRepo) RegisterStockInput(productStockID, quantity int64) resterr
 	return nil
 }
 
-func (s *productRepo) GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, restErr resterrors.RestErr) {
+func (s *productRepo) GetAvailableQuantityByProductStockID(productStockID int64) (availableQuantity int64, err error) {
 
 	query := `
 		SELECT
@@ -234,7 +233,7 @@ func (s *productRepo) GetAvailableQuantityByProductStockID(productStockID int64)
 	return availableQuantity, nil
 }
 
-func (s *productRepo) UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) resterrors.RestErr {
+func (s *productRepo) UpdateAvailableQuantityByProductStockID(productStockID, quantity int64) error {
 
 	query := `
 		UPDATE 	tab_product_stock
@@ -257,7 +256,7 @@ func (s *productRepo) UpdateAvailableQuantityByProductStockID(productStockID, qu
 	return nil
 }
 
-func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock []entity.ProductStock, restErr resterrors.RestErr) {
+func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock []entity.ProductStock, err error) {
 
 	query := `
 		SELECT
@@ -305,7 +304,7 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 	return productsStock, nil
 }
 
-func (s *productRepo) CreateProductStock(productID int64, productStock entity.ProductStock) (producStockID int64, restErr resterrors.RestErr) {
+func (s *productRepo) CreateProductStock(productID int64, productStock entity.ProductStock) (producStockID int64, err error) {
 
 	query := `
 		INSERT INTO tab_product_stock (
@@ -340,7 +339,7 @@ func (s *productRepo) CreateProductStock(productID int64, productStock entity.Pr
 	return producStockID, nil
 }
 
-func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr resterrors.RestErr) {
+func (s *productRepo) CreateBrand(brandName string) (brandID int64, err error) {
 
 	query := `
 		INSERT INTO tab_brand (
@@ -371,7 +370,7 @@ func (s *productRepo) CreateBrand(brandName string) (brandID int64, restErr rest
 	return brandID, nil
 }
 
-func (s *productRepo) GetBrandByName(brandName string) (brandID int64, restErr resterrors.RestErr) {
+func (s *productRepo) GetBrandByName(brandName string) (brandID int64, err error) {
 
 	query := `
 		SELECT
@@ -403,7 +402,7 @@ func (s *productRepo) GetBrandByName(brandName string) (brandID int64, restErr r
 	return brandID, nil
 }
 
-func (s *productRepo) CreateColor(colorName string) (colorID int64, restErr resterrors.RestErr) {
+func (s *productRepo) CreateColor(colorName string) (colorID int64, err error) {
 
 	query := `
 		INSERT INTO tab_color (
@@ -434,7 +433,7 @@ func (s *productRepo) CreateColor(colorName string) (colorID int64, restErr rest
 	return colorID, nil
 }
 
-func (s *productRepo) GetColorByName(colorName string) (colorID int64, restErr resterrors.RestErr) {
+func (s *productRepo) GetColorByName(colorName string) (colorID int64, err error) {
 
 	query := `
 		SELECT
@@ -466,7 +465,7 @@ func (s *productRepo) GetColorByName(colorName string) (colorID int64, restErr r
 	return colorID, nil
 }
 
-func (s *productRepo) CreateGender(genderName string) (genderID int64, restErr resterrors.RestErr) {
+func (s *productRepo) CreateGender(genderName string) (genderID int64, err error) {
 
 	query := `
 		INSERT INTO tab_gender (
@@ -497,7 +496,7 @@ func (s *productRepo) CreateGender(genderName string) (genderID int64, restErr r
 	return genderID, nil
 }
 
-func (s *productRepo) GetGenderByName(genderName string) (genderID int64, restErr resterrors.RestErr) {
+func (s *productRepo) GetGenderByName(genderName string) (genderID int64, err error) {
 
 	query := `
 		SELECT

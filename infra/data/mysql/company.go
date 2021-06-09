@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
-	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -17,7 +16,7 @@ func newCompanyRepo(db connection) *companyRepo {
 	}
 }
 
-func (s *companyRepo) CreateCompany(company entity.Company) resterrors.RestErr {
+func (s *companyRepo) CreateCompany(company entity.Company) error {
 
 	query := `
 		INSERT INTO tab_company (
@@ -47,7 +46,7 @@ func (s *companyRepo) CreateCompany(company entity.Company) resterrors.RestErr {
 	return nil
 }
 
-func (s *companyRepo) GetCompanies() (companies []entity.Company, restErr resterrors.RestErr) {
+func (s *companyRepo) GetCompanies() (companies []entity.Company, err error) {
 
 	query := `
 		SELECT
@@ -87,7 +86,7 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, restErr rester
 	return companies, nil
 }
 
-func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, restErr resterrors.RestErr) {
+func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, err error) {
 
 	query := `
 		SELECT

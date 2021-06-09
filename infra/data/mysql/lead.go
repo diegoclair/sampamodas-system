@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"github.com/diegoclair/go_utils-lib/mysqlutils"
-	"github.com/diegoclair/go_utils-lib/resterrors"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
 )
 
@@ -16,7 +15,7 @@ func newLeadRepo(db connection) *leadRepo {
 	}
 }
 
-func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, restErr resterrors.RestErr) {
+func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error) {
 
 	query := `
 		SELECT
@@ -54,7 +53,7 @@ func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, r
 	return lead, nil
 }
 
-func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, restErr resterrors.RestErr) {
+func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, err error) {
 
 	query := `
 		SELECT
@@ -107,7 +106,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 	return addresses, nil
 }
 
-func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, restErr resterrors.RestErr) {
+func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, err error) {
 
 	query := `
 		INSERT INTO tab_lead (
@@ -144,7 +143,7 @@ func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, restErr resterror
 	return leadID, nil
 }
 
-func (s *leadRepo) CreateLeadAddress(leadAddress entity.LeadAddress) resterrors.RestErr {
+func (s *leadRepo) CreateLeadAddress(leadAddress entity.LeadAddress) error {
 
 	query := `
 		INSERT INTO tab_lead_address (
