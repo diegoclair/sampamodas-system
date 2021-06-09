@@ -25,8 +25,8 @@ func GetAndValidateInt64Param(c echo.Context, paramName string, isRequired bool)
 
 func GetAndValidateStringParam(c echo.Context, paramName string, isRequired bool) (param string, err error) {
 
-	stringParam := c.Param(paramName)
-	if isRequired && stringParam == "" {
+	param = c.Param(paramName)
+	if isRequired && param == "" {
 		return param, resterrors.NewBadRequestError(fmt.Sprintf("The route parameter '%s' is required", paramName))
 	}
 

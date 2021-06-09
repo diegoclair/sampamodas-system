@@ -159,13 +159,13 @@ var (
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					PRIMARY KEY (lead_id, phone_number),
 					UNIQUE INDEX id_UNIQUE (lead_id ASC) VISIBLE,
-					UNIQUE INDEX phone_number_UNIQUE (phone_number ASC) VISIBLE),
+					UNIQUE INDEX phone_number_UNIQUE (phone_number ASC) VISIBLE,
 					INDEX fk_tab_lead_tab_business1_idx (business_id ASC) VISIBLE,
 					CONSTRAINT fk_tab_lead_tab_business1
 					FOREIGN KEY (business_id)
 					REFERENCES tab_business (business_id)
 					ON DELETE NO ACTION
-					ON UPDATE NO ACTION,
+					ON UPDATE NO ACTION)
 				ENGINE=InnoDB CHARACTER SET=utf8;
 			`,
 		},

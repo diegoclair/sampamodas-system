@@ -51,8 +51,15 @@ func (s *businessService) GetBusinessesByCompanyUUID(companyUUID string) (busine
 
 func (s *businessService) CreateBusiness(business entity.Business) error {
 
+	companyID, err := s.svc.dm.MySQL().Company().GetCompanyIDByUUID(business.CompanyUUID)
+	if err != nil {
+		logger.Error("businessService.CreateBusiness.GetCompanyIDByUUID: ", err)
+		return err
+	}
 	business.UUID = uuid.NewV4().String()
-	err := s.svc.dm.MySQL().Business().CreateBusiness(business)
+	business.CompanyID = companyID
+
+	err = s.svc.dm.MySQL().Business().CreateBusiness(business)
 	if err != nil {
 		logger.Error("businessService.CreateBusiness.CreateBusiness: ", err)
 		return err
