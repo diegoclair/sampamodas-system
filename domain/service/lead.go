@@ -19,17 +19,18 @@ func newLeadService(svc *Service) LeadService {
 
 func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error) {
 
-	//the lead should be by business, so a company cant acess other leads ..
+	logger.Info("GetLeadByPhoneNumber: Process Started")
+	defer logger.Info("GetLeadByPhoneNumber: Process Finished")
 
 	lead, err = s.svc.dm.MySQL().Lead().GetLeadByPhoneNumber(phoneNumber)
 	if err != nil {
-		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadByPhoneNumber: ", err)
+		logger.Error("GetLeadByPhoneNumber.GetLeadByPhoneNumber: ", err)
 		return lead, err
 	}
 
 	lead.LeadAddress, err = s.svc.dm.MySQL().Lead().GetLeadAddressByLeadID(lead.ID)
 	if err != nil {
-		logger.Error("leadService.GetLeadByPhoneNumber.GetLeadAddressByLeadID: ", err)
+		logger.Error("GetLeadByPhoneNumber.GetLeadAddressByLeadID: ", err)
 		return lead, err
 	}
 
@@ -38,10 +39,13 @@ func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead
 
 func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, err error) {
 
+	logger.Info("CreateLead: Process Started")
+	defer logger.Info("CreateLead: Process Finished")
+
 	lead.UUID = uuid.NewV4().String()
 	leadID, err = s.svc.dm.MySQL().Lead().CreateLead(lead)
 	if err != nil {
-		logger.Error("leadService.CreateLead.CreateLead: ", err)
+		logger.Error("CreateLead.CreateLead: ", err)
 		return leadID, err
 	}
 
@@ -50,9 +54,12 @@ func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, err error) {
 
 func (s *leadService) CreateLeadAddress(leadAddress entity.LeadAddress) error {
 
+	logger.Info("CreateLeadAddress: Process Started")
+	defer logger.Info("CreateLeadAddress: Process Finished")
+
 	err := s.svc.dm.MySQL().Lead().CreateLeadAddress(leadAddress)
 	if err != nil {
-		logger.Error("leadService.CreateLeadAddress.CreateLeadAddress: ", err)
+		logger.Error("CreateLeadAddress.CreateLeadAddress: ", err)
 		return err
 	}
 

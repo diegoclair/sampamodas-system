@@ -22,16 +22,19 @@ func newProductService(svc *Service) ProductService {
 
 func (s *productService) GetProducts() (products []entity.Product, err error) {
 
+	logger.Info("GetProducts: Process Started")
+	defer logger.Info("GetProducts: Process Finished")
+
 	products, err = s.svc.dm.MySQL().Product().GetProducts()
 	if err != nil {
-		logger.Error("productService.GetProducts.GetProducts", err)
+		logger.Error("GetProducts.GetProducts", err)
 		return products, err
 	}
 
 	for i := range products {
 		products[i].ProductStock, err = s.svc.dm.MySQL().Product().GetStockProductByProductID(products[i].ID)
 		if err != nil {
-			logger.Error("productService.GetProducts.GetStockProductByProductID", err)
+			logger.Error("GetProducts.GetStockProductByProductID", err)
 			return products, err
 		}
 	}
@@ -41,9 +44,12 @@ func (s *productService) GetProducts() (products []entity.Product, err error) {
 
 func (s *productService) GetProductByID(productID int64) (product entity.Product, err error) {
 
+	logger.Info("GetProductByID: Process Started")
+	defer logger.Info("GetProductByID: Process Finished")
+
 	product, err = s.svc.dm.MySQL().Product().GetProductByID(productID)
 	if err != nil {
-		logger.Error("productService.GetProductByID.GetProductByID", err)
+		logger.Error("GetProductByID.GetProductByID", err)
 		return product, err
 	}
 	return product, nil
@@ -51,21 +57,24 @@ func (s *productService) GetProductByID(productID int64) (product entity.Product
 
 func (s *productService) GetProductByProductStockID(productStockID int64) (product entity.Product, err error) {
 
+	logger.Info("GetProductByProductStockID: Process Started")
+	defer logger.Info("GetProductByProductStockID: Process Finished")
+
 	productID, err := s.svc.dm.MySQL().Product().GetProductIDByProductStockID(productStockID)
 	if err != nil {
-		logger.Error("productService.GetProductByProductStockID.GetProductIDByProductStockID", err)
+		logger.Error("GetProductByProductStockID.GetProductIDByProductStockID", err)
 		return product, err
 	}
 
 	product, err = s.svc.dm.MySQL().Product().GetProductByID(productID)
 	if err != nil {
-		logger.Error("productService.GetProductByProductStockID.GetProductByID", err)
+		logger.Error("GetProductByProductStockID.GetProductByID", err)
 		return product, err
 	}
 
 	product.ProductStock, err = s.svc.dm.MySQL().Product().GetStockProductByProductID(productID)
 	if err != nil {
-		logger.Error("productService.GetProducts.GetStockProductByProductID", err)
+		logger.Error("GetProductByProductStockID.GetStockProductByProductID", err)
 		return product, err
 	}
 
@@ -73,6 +82,9 @@ func (s *productService) GetProductByProductStockID(productStockID int64) (produ
 }
 
 func (s *productService) CreateProduct(product entity.Product) (err error) {
+
+	logger.Info("CreateProduct: Process Started")
+	defer logger.Info("CreateProduct: Process Finished")
 
 	product.Brand.ID, err = s.getBrandIDByName(product.Brand.Name)
 	if err != nil {
@@ -86,7 +98,7 @@ func (s *productService) CreateProduct(product entity.Product) (err error) {
 
 	tx, err := s.svc.dm.MySQL().Begin()
 	if err != nil {
-		logger.Error("productService.CreateProduct.Begin: Database transaction error: ", err)
+		logger.Error("CreateProduct.Begin: ", err)
 		return err
 	}
 	defer tx.Rollback()
@@ -95,7 +107,7 @@ func (s *productService) CreateProduct(product entity.Product) (err error) {
 
 	product.ID, err = tx.Product().CreateProduct(product)
 	if err != nil {
-		logger.Error("productService.CreateProduct.CreateProduct: ", err)
+		logger.Error("CreateProduct.CreateProduct: ", err)
 		return err
 	}
 
@@ -110,7 +122,7 @@ func (s *productService) CreateProduct(product entity.Product) (err error) {
 
 		productStockID, err := tx.Product().CreateProductStock(product.ID, product.ProductStock[i])
 		if err != nil {
-			logger.Error("productService.CreateProduct.CreateProductStock: ", err)
+			logger.Error("CreateProduct.CreateProductStock: ", err)
 			return err
 		}
 
@@ -128,7 +140,7 @@ func (s *productService) CreateProduct(product entity.Product) (err error) {
 
 	err = tx.Commit()
 	if err != nil {
-		logger.Error("productService.CreateProduct.Commit: ", err)
+		logger.Error("CreateProduct.Commit: ", err)
 		return resterrors.NewInternalServerError("Database transaction commit error")
 	}
 
@@ -137,9 +149,12 @@ func (s *productService) CreateProduct(product entity.Product) (err error) {
 
 func (s *productService) addStockAvailableQuantity(productStockID, quantity int64, tx contract.MysqlTransaction) (err error) {
 
+	logger.Info("addStockAvailableQuantity: Process Started")
+	defer logger.Info("addStockAvailableQuantity: Process Finished")
+
 	actualAvailableQuantity, err := s.svc.dm.MySQL().Product().GetAvailableQuantityByProductStockID(productStockID)
 	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
-		logger.Error("productService.addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", err)
+		logger.Error("addStockAvailableQuantity.GetAvailableQuantityByProductStockID: ", err)
 		return err
 	}
 
@@ -147,7 +162,7 @@ func (s *productService) addStockAvailableQuantity(productStockID, quantity int6
 
 	err = tx.Product().UpdateAvailableQuantityByProductStockID(productStockID, availableQuantity)
 	if err != nil {
-		logger.Error("productService.addStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", err)
+		logger.Error("addStockAvailableQuantity.UpdateAvailableQuantityByProductStockID: ", err)
 		return err
 	}
 
@@ -156,9 +171,12 @@ func (s *productService) addStockAvailableQuantity(productStockID, quantity int6
 
 func (s *productService) registerStockInput(productStockID, quantity int64, tx contract.MysqlTransaction) (err error) {
 
+	logger.Info("registerStockInput: Process Started")
+	defer logger.Info("registerStockInput: Process Finished")
+
 	err = tx.Product().RegisterStockInput(productStockID, quantity)
 	if err != nil {
-		logger.Error("productService.registerStockInput.RegisterStockInput: ", err)
+		logger.Error("registerStockInput.RegisterStockInput: ", err)
 		return err
 	}
 
@@ -167,10 +185,13 @@ func (s *productService) registerStockInput(productStockID, quantity int64, tx c
 
 func (s *productService) getBrandIDByName(brandName string) (brandID int64, err error) {
 
+	logger.Info("getBrandIDByName: Process Started")
+	defer logger.Info("getBrandIDByName: Process Finished")
+
 	format.FirstLetterUpperCase(&brandName)
 	brandID, err = s.svc.dm.MySQL().Product().GetBrandByName(brandName)
 	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
-		logger.Error("getColorIDByName.GetBrandByName: ", err)
+		logger.Error("getBrandIDByName.GetBrandByName: ", err)
 		return brandID, err
 	}
 
@@ -180,7 +201,7 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 
 	brandID, err = s.svc.dm.MySQL().Product().CreateBrand(brandName)
 	if err != nil {
-		logger.Error("getColorIDByName.CreateBrand: ", err)
+		logger.Error("getBrandIDByName.CreateBrand: ", err)
 		return brandID, err
 	}
 
@@ -188,6 +209,9 @@ func (s *productService) getBrandIDByName(brandName string) (brandID int64, err 
 }
 
 func (s *productService) getColorIDByName(colorName string) (colorID int64, err error) {
+
+	logger.Info("getColorIDByName: Process Started")
+	defer logger.Info("getColorIDByName: Process Finished")
 
 	format.FirstLetterUpperCase(&colorName)
 	colorID, err = s.svc.dm.MySQL().Product().GetColorByName(colorName)
@@ -211,10 +235,13 @@ func (s *productService) getColorIDByName(colorName string) (colorID int64, err 
 
 func (s *productService) getGenderIDByName(genderName string) (genderID int64, err error) {
 
+	logger.Info("getGenderIDByName: Process Started")
+	defer logger.Info("getGenderIDByName: Process Finished")
+
 	format.FirstLetterUpperCase(&genderName)
 	genderID, err = s.svc.dm.MySQL().Product().GetGenderByName(genderName)
 	if err != nil && !errors.SQLResultIsEmpty(err.Error()) {
-		logger.Error("getColorIDByName.GetGenderByName: ", err)
+		logger.Error("getGenderIDByName.GetGenderByName: ", err)
 		return genderID, err
 	}
 
@@ -224,7 +251,7 @@ func (s *productService) getGenderIDByName(genderName string) (genderID int64, e
 
 	genderID, err = s.svc.dm.MySQL().Product().CreateGender(genderName)
 	if err != nil {
-		logger.Error("getColorIDByName.CreateGender: ", err)
+		logger.Error("getGenderIDByName.CreateGender: ", err)
 		return genderID, err
 	}
 

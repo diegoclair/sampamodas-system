@@ -19,9 +19,12 @@ func newCompanyService(svc *Service) CompanyService {
 
 func (s *companyService) GetCompanies() (companies []entity.Company, err error) {
 
+	logger.Info("GetCompanies: Process Started")
+	defer logger.Info("GetCompanies: Process Finished")
+
 	companies, err = s.svc.dm.MySQL().Company().GetCompanies()
 	if err != nil {
-		logger.Error("companyService.GetCompanies.GetCompanies: ", err)
+		logger.Error("GetCompanies.GetCompanies: ", err)
 		return companies, err
 	}
 
@@ -30,9 +33,12 @@ func (s *companyService) GetCompanies() (companies []entity.Company, err error) 
 
 func (s *companyService) GetCompanyByUUID(companyUUID string) (company entity.Company, err error) {
 
+	logger.Info("GetCompanyByUUID: Process Started")
+	defer logger.Info("GetCompanyByUUID: Process Finished")
+
 	company, err = s.svc.dm.MySQL().Company().GetCompanyByUUID(companyUUID)
 	if err != nil {
-		logger.Error("companyService.GetCompanies.GetCompanyByUUID: ", err)
+		logger.Error("GetCompanyByUUID.GetCompanyByUUID: ", err)
 		return company, err
 	}
 
@@ -41,10 +47,13 @@ func (s *companyService) GetCompanyByUUID(companyUUID string) (company entity.Co
 
 func (s *companyService) CreateCompany(company entity.Company) error {
 
+	logger.Info("CreateCompany: Process Started")
+	defer logger.Info("CreateCompany: Process Finished")
+
 	company.UUID = uuid.NewV4().String()
 	err := s.svc.dm.MySQL().Company().CreateCompany(company)
 	if err != nil {
-		logger.Error("companyService.GetCompanies.CreateCompany: ", err)
+		logger.Error("CreateCompany.CreateCompany: ", err)
 		return err
 	}
 
