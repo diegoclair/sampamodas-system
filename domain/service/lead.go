@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/diegoclair/go_utils-lib/logger"
 	"github.com/diegoclair/sampamodas-system/backend/domain/entity"
+	"github.com/twinj/uuid"
 )
 
 type leadService struct {
@@ -17,6 +18,8 @@ func newLeadService(svc *Service) LeadService {
 }
 
 func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error) {
+
+	//the lead should be by business, so a company cant acess other leads ..
 
 	lead, err = s.svc.dm.MySQL().Lead().GetLeadByPhoneNumber(phoneNumber)
 	if err != nil {
@@ -35,6 +38,7 @@ func (s *leadService) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead
 
 func (s *leadService) CreateLead(lead entity.Lead) (leadID int64, err error) {
 
+	lead.UUID = uuid.NewV4().String()
 	leadID, err = s.svc.dm.MySQL().Lead().CreateLead(lead)
 	if err != nil {
 		logger.Error("leadService.CreateLead.CreateLead: ", err)

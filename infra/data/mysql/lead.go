@@ -20,6 +20,7 @@ func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, e
 	query := `
 		SELECT
 			tl.lead_id,
+			tl.lead_uuid,
 			tl.name,
 			tl.email,
 			tl.phone_number,
@@ -41,6 +42,7 @@ func (s *leadRepo) GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, e
 
 	err = row.Scan(
 		&lead.ID,
+		&lead.UUID,
 		&lead.Name,
 		&lead.Email,
 		&lead.PhoneNumber,
@@ -59,6 +61,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 		SELECT
 			tla.lead_address_id,
 			tla.lead_id,
+			tl.lead_uuid,
 			tla.address_type,
 			tla.street,
 			tla.number,
@@ -69,6 +72,9 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 			tla.zip_code
 
 		FROM 	tab_lead_address tla
+		
+		INNER JOIN 	tab_lead 	tl
+		ON		tl.lead_id	= tla.lead_id
 
 		WHERE  	tla.lead_id = ?`
 
@@ -88,6 +94,7 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 		err = rows.Scan(
 			&address.ID,
 			&address.LeadID,
+			&address.LeadUUID,
 			&address.AddressType,
 			&address.Street,
 			&address.Number,
@@ -110,13 +117,14 @@ func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, err error) {
 
 	query := `
 		INSERT INTO tab_lead (
+			lead_uuid,
 			name,
 			email,
 			phone_number,
 			instagram
 		) 
 		VALUES	
-			(?, ?, ?, ?);
+			(?, ?, ?, ?, ?);
 		`
 
 	stmt, err := s.db.Prepare(query)
@@ -126,6 +134,7 @@ func (s *leadRepo) CreateLead(lead entity.Lead) (leadID int64, err error) {
 	defer stmt.Close()
 
 	result, err := stmt.Exec(
+		lead.UUID,
 		lead.Name,
 		lead.Email,
 		lead.PhoneNumber,

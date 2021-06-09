@@ -20,12 +20,13 @@ func (s *companyRepo) CreateCompany(company entity.Company) error {
 
 	query := `
 		INSERT INTO tab_company (
+			company_uuid,
 			document_number,
 			legal_name,
 			commercial_name
 		) 
 		VALUES	
-			(?, ?, ?);
+			(?, ?, ?, ?);
 		`
 
 	stmt, err := s.db.Prepare(query)
@@ -35,6 +36,7 @@ func (s *companyRepo) CreateCompany(company entity.Company) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
+		company.UUID,
 		company.DocumentNumber,
 		company.LegalName,
 		company.CommercialName,
@@ -51,6 +53,7 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, err error) {
 	query := `
 		SELECT
 			tc.company_id,
+			tc.company_uuid,
 			tc.document_number,
 			tc.legal_name,
 			tc.commercial_name
@@ -73,6 +76,7 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, err error) {
 	for rows.Next() {
 		err = rows.Scan(
 			&company.ID,
+			&company.UUID,
 			&company.DocumentNumber,
 			&company.LegalName,
 			&company.CommercialName,
@@ -86,17 +90,18 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, err error) {
 	return companies, nil
 }
 
-func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, err error) {
+func (s *companyRepo) GetCompanyByUUID(companyUUID string) (company entity.Company, err error) {
 
 	query := `
 		SELECT
 			tc.company_id,
+			tc.company_uuid,
 			tc.document_number,
 			tc.legal_name,
 			tc.commercial_name
 
 		FROM 	tab_company 	tc
-		WHERE  	tc.company_id 	= ?
+		WHERE  	tc.company_uuid 	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
@@ -105,13 +110,14 @@ func (s *companyRepo) GetCompanyByID(companyID int64) (company entity.Company, e
 	}
 	defer stmt.Close()
 
-	result := stmt.QueryRow(companyID)
+	result := stmt.QueryRow(companyUUID)
 	if err != nil {
 		return company, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(
 		&company.ID,
+		&company.UUID,
 		&company.DocumentNumber,
 		&company.LegalName,
 		&company.CommercialName,

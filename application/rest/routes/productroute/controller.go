@@ -87,7 +87,7 @@ func (s *Controller) handleGetProductByID(c echo.Context) error {
 		return routeutils.HandleAPIError(c, err)
 	}
 
-	product, err := s.productService.GetProductByID(int64(productID))
+	product, err := s.productService.GetProductByID(productID)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}

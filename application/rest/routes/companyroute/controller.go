@@ -76,12 +76,12 @@ func (s *Controller) handleGetCompanies(c echo.Context) error {
 
 func (s *Controller) handleGetCompanyByID(c echo.Context) error {
 
-	companyID, err := routeutils.GetAndValidateInt64Param(c, "id", true)
+	companyUUID, err := routeutils.GetAndValidateStringParam(c, "uuid", true)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}
 
-	company, err := s.companyService.GetCompanyByID(int64(companyID))
+	company, err := s.companyService.GetCompanyByUUID(companyUUID)
 	if err != nil {
 		return routeutils.HandleAPIError(c, err)
 	}

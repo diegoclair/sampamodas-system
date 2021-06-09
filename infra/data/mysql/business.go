@@ -20,11 +20,12 @@ func (s *businessRepo) CreateBusiness(business entity.Business) error {
 
 	query := `
 		INSERT INTO tab_business (
+			business_uuid,
 			company_id,
 			name
 		) 
 		VALUES	
-			(?, ?);
+			(?, ?, ?);
 		`
 
 	stmt, err := s.db.Prepare(query)
@@ -34,6 +35,7 @@ func (s *businessRepo) CreateBusiness(business entity.Business) error {
 	defer stmt.Close()
 
 	_, err = stmt.Exec(
+		business.UUID,
 		business.CompanyID,
 		business.Name,
 	)
@@ -49,6 +51,7 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, err error)
 	query := `
 		SELECT
 			tb.business_id,
+			tb.business_uuid,
 			tb.company_id,
 			tb.name
 
@@ -70,6 +73,7 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, err error)
 	for rows.Next() {
 		err = rows.Scan(
 			&business.ID,
+			&business.UUID,
 			&business.CompanyID,
 			&business.Name,
 		)
@@ -82,16 +86,17 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, err error)
 	return businesses, nil
 }
 
-func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Business, err error) {
+func (s *businessRepo) GetBusinessByUUID(businessUUID string) (business entity.Business, err error) {
 
 	query := `
 		SELECT
 			tb.business_id,
+			tb.business_uuid,
 			tb.company_id,
 			tb.name
 
-		FROM 	tab_business 	tb
-		WHERE  	tb.business_id 	= ?
+		FROM 	tab_business 		tb
+		WHERE  	tb.business_uuid 	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
@@ -100,13 +105,14 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 	}
 	defer stmt.Close()
 
-	result := stmt.QueryRow(businessID)
+	result := stmt.QueryRow(businessUUID)
 	if err != nil {
 		return business, mysqlutils.HandleMySQLError(err)
 	}
 
 	err = result.Scan(
 		&business.ID,
+		&business.UUID,
 		&business.CompanyID,
 		&business.Name,
 	)
@@ -117,16 +123,17 @@ func (s *businessRepo) GetBusinessByID(businessID int64) (business entity.Busine
 	return business, nil
 }
 
-func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, err error) {
+func (s *businessRepo) GetBusinessesByCompanyUUID(companyUUID string) (businesses []entity.Business, err error) {
 
 	query := `
 		SELECT
 			tb.business_id,
+			tb.business_uuid,
 			tb.company_id,
 			tb.name
 
 		FROM 	tab_business	tb
-		WHERE 	tb.company_id	= ?
+		WHERE 	tb.company_uuid	= ?
 	`
 
 	stmt, err := s.db.Prepare(query)
@@ -135,7 +142,7 @@ func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []e
 	}
 	defer stmt.Close()
 
-	rows, err := stmt.Query(companyID)
+	rows, err := stmt.Query(companyUUID)
 	if err != nil {
 		return businesses, mysqlutils.HandleMySQLError(err)
 	}
@@ -144,6 +151,7 @@ func (s *businessRepo) GetBusinessesByCompanyID(companyID int64) (businesses []e
 	for rows.Next() {
 		err = rows.Scan(
 			&business.ID,
+			&business.UUID,
 			&business.CompanyID,
 			&business.Name,
 		)

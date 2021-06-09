@@ -38,15 +38,15 @@ type PingService interface {
 type BusinessService interface {
 	CreateBusiness(company entity.Business) error
 	GetBusinesses() (businesses []entity.Business, err error)
-	GetBusinessByID(businessID int64) (businesses entity.Business, err error)
-	GetBusinessesByCompanyID(companyID int64) (businesses []entity.Business, err error)
+	GetBusinessByUUID(businessUUID string) (businesses entity.Business, err error)
+	GetBusinessesByCompanyUUID(companyUUID string) (businesses []entity.Business, err error)
 }
 
 // CompanyService holds a company service operations
 type CompanyService interface {
 	CreateCompany(company entity.Company) error
 	GetCompanies() (companies []entity.Company, err error)
-	GetCompanyByID(companyID int64) (company entity.Company, err error)
+	GetCompanyByUUID(companyUUID string) (company entity.Company, err error)
 }
 
 // LeadService holds a lead service operations
