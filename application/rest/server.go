@@ -16,13 +16,14 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-type controller struct {
-	pingController     *pingroute.Controller
-	businessController *businessroute.Controller
-	companyController  *companyroute.Controller
-	leadController     *leadroute.Controller
-	productController  *productroute.Controller
-	saleController     *saleroute.Controller
+// IRouter interface for routers
+type IRouter interface {
+	RegisterRoutes(appGroup, privateGroup *echo.Group)
+}
+
+// Router holds application's routers
+type Router struct {
+	routers []IRouter
 }
 
 //StartRestServer starts the restServer
@@ -49,25 +50,43 @@ func initServer() *echo.Echo {
 	srv := echo.New()
 	srv.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
-	return registerRoutes(srv, &controller{
-		pingController:     pingroute.NewController(),
-		businessController: businessroute.NewController(factory.BusinessService, factory.Mapper),
-		companyController:  companyroute.NewController(factory.CompanyService, factory.Mapper),
-		leadController:     leadroute.NewController(factory.LeadService, factory.Mapper),
-		productController:  productroute.NewController(factory.ProductService, factory.Mapper),
-		saleController:     saleroute.NewController(factory.SaleService, factory.Mapper),
-	})
+	pingController := pingroute.NewController()
+	businessController := businessroute.NewController(factory.BusinessService, factory.Mapper)
+	companyController := companyroute.NewController(factory.CompanyService, factory.Mapper)
+	leadController := leadroute.NewController(factory.LeadService, factory.Mapper)
+	productController := productroute.NewController(factory.ProductService, factory.Mapper)
+	saleController := saleroute.NewController(factory.SaleService, factory.Mapper)
+
+	pingRoute := pingroute.NewRouter(pingController, "ping")
+	businessRoute := businessroute.NewRouter(businessController, "businessess")
+	companyRoute := companyroute.NewRouter(companyController, "companies")
+	leadRoute := leadroute.NewRouter(leadController, "leads")
+	productRoute := productroute.NewRouter(productController, "products")
+	saleRoute := saleroute.NewRouter(saleController, "sales")
+
+	appRouter := &Router{}
+	appRouter.addRouters(pingRoute)
+	appRouter.addRouters(businessRoute)
+	appRouter.addRouters(companyRoute)
+	appRouter.addRouters(leadRoute)
+	appRouter.addRouters(productRoute)
+	appRouter.addRouters(saleRoute)
+
+	return appRouter.registerAppRouters(srv)
 }
 
-//registerRoutes - Register and instantiate routes
-func registerRoutes(srv *echo.Echo, s *controller) *echo.Echo {
+func (r *Router) addRouters(router IRouter) {
+	r.routers = append(r.routers, router)
+}
 
-	pingroute.NewRouter(s.pingController, srv).RegisterRoutes()
-	businessroute.NewRouter(s.businessController, srv).RegisterRoutes()
-	companyroute.NewRouter(s.companyController, srv).RegisterRoutes()
-	leadroute.NewRouter(s.leadController, srv).RegisterRoutes()
-	productroute.NewRouter(s.productController, srv).RegisterRoutes()
-	saleroute.NewRouter(s.saleController, srv).RegisterRoutes()
+func (r *Router) registerAppRouters(srv *echo.Echo) *echo.Echo {
+
+	appGroup := srv.Group("/")
+	privateGroup := appGroup.Group("") //future create middleware to check logged user
+
+	for _, appRouter := range r.routers {
+		appRouter.RegisterRoutes(appGroup, privateGroup)
+	}
 
 	return srv
 }

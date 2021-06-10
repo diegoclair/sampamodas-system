@@ -4,23 +4,28 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// ProductRouter holds the product handlers
+const (
+	rootRoute   = "/"
+	productByID = "/:id/"
+)
+
 type ProductRouter struct {
-	ctrl   *Controller
-	router *echo.Echo
+	ctrl      *Controller
+	routeName string
 }
 
 // NewRouter returns a new ProductRouter instance
-func NewRouter(ctrl *Controller, router *echo.Echo) *ProductRouter {
+func NewRouter(ctrl *Controller, routeName string) *ProductRouter {
 	return &ProductRouter{
-		ctrl:   ctrl,
-		router: router,
+		ctrl:      ctrl,
+		routeName: routeName,
 	}
 }
 
 //RegisterRoutes is a routers map of product requests
-func (r *ProductRouter) RegisterRoutes() {
-	r.router.POST("/product/", r.ctrl.handleCreateProduct)
-	r.router.GET("/products/", r.ctrl.handleGetProducts)
-	r.router.GET("/product/:id/", r.ctrl.handleGetProductByID)
+func (r *ProductRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
+	router := privateGroup.Group(r.routeName)
+	router.POST(rootRoute, r.ctrl.handleCreateProduct)
+	router.GET(rootRoute, r.ctrl.handleGetProducts)
+	router.GET(productByID, r.ctrl.handleGetProductByID)
 }

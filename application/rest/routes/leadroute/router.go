@@ -4,23 +4,29 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// LeadRouter holds the lead handlers
+const (
+	rootRoute         = "/"
+	createAddress     = "/address/"
+	leadByPhoneNumber = "/:phone_number/"
+)
+
 type LeadRouter struct {
-	ctrl   *Controller
-	router *echo.Echo
+	ctrl      *Controller
+	routeName string
 }
 
 // NewRouter returns a new LeadRouter instance
-func NewRouter(ctrl *Controller, router *echo.Echo) *LeadRouter {
+func NewRouter(ctrl *Controller, routeName string) *LeadRouter {
 	return &LeadRouter{
-		ctrl:   ctrl,
-		router: router,
+		ctrl:      ctrl,
+		routeName: routeName,
 	}
 }
 
 //RegisterRoutes is a routers map of lead requests
-func (r *LeadRouter) RegisterRoutes() {
-	r.router.POST("/lead/", r.ctrl.handleCreateLead)
-	r.router.POST("/lead/address/", r.ctrl.handleCreateLeadAddress)
-	r.router.GET("/lead/:phone_number/", r.ctrl.handleGetLeadByPhoneNumber)
+func (r *LeadRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
+	router := privateGroup.Group(r.routeName)
+	router.POST(rootRoute, r.ctrl.handleCreateLead)
+	router.POST(createAddress, r.ctrl.handleCreateLeadAddress)
+	router.GET(leadByPhoneNumber, r.ctrl.handleGetLeadByPhoneNumber)
 }
