@@ -366,12 +366,13 @@ var (
 					name VARCHAR(450) NOT NULL,
 					email VARCHAR(85) NULL,
 					password VARCHAR(200) NOT NULL,
-					company_id INT NOT NULL,
+					company_id INT NULL,
 					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 					active TINYINT(1) NOT NULL DEFAULT 1,
 					PRIMARY KEY (user_id),
 					UNIQUE INDEX user_id_UNIQUE (user_id ASC) VISIBLE,
+					UNIQUE INDEX email_UNIQUE (email ASC) VISIBLE,
 					INDEX fk_tab_user_tab_company_idx (company_id ASC) VISIBLE,
 					CONSTRAINT fk_tab_user_tab_company
 					FOREIGN KEY (company_id)

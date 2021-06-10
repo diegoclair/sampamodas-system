@@ -66,8 +66,8 @@ github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSs
 github.com/dgrijalva/jwt-go v3.2.0+incompatible h1:7qlOGliEKZXTDg6OTjfoBKDXWrumCAMpl/TFQ4/5kLM=
 github.com/dgrijalva/jwt-go v3.2.0+incompatible/go.mod h1:E3ru+11k8xSBh+hMPgOLZmtrrCbhqsmaPHjLKYnJCaQ=
 github.com/dgryski/go-sip13 v0.0.0-20181026042036-e10d5fee7954/go.mod h1:vAd38F8PWV+bWy6jNmig1y/TA+kYO4g3RSRF0IAv0no=
-github.com/diegoclair/go_utils-lib/v2 v2.3.1 h1:irpoWA6gtHewu3x4uWCb+8v4m5NStgxk7EeaKd0d3rE=
-github.com/diegoclair/go_utils-lib/v2 v2.3.1/go.mod h1:TNjZoM1DKItAK6Y4GkbV222gNWaJLZaoSMeCOURLy3k=
+github.com/diegoclair/go_utils-lib/v2 v2.4.1 h1:UfWcfsJIZfRRY12fwK2175+nq+D/HL2Jo6iBSXDJm0o=
+github.com/diegoclair/go_utils-lib/v2 v2.4.1/go.mod h1:TNjZoM1DKItAK6Y4GkbV222gNWaJLZaoSMeCOURLy3k=
 github.com/edsrzf/mmap-go v0.0.0-20170320065105-0bce6a688712 h1:aaQcKT9WumO6JEJcRyTqFVq4XUZiUcKR2/GI31TOcz8=
 github.com/edsrzf/mmap-go v0.0.0-20170320065105-0bce6a688712/go.mod h1:YO35OhQPt3KJa3ryjFM5Bs14WD66h8eGKpfaBNrHW5M=
 github.com/fatih/color v1.7.0/go.mod h1:Zm6kSWBoL9eyXnKyktHP6abPY2pDugNf5KwzbycvMj4=

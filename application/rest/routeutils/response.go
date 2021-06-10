@@ -50,7 +50,7 @@ func HandleAPIError(c echo.Context, errorToHandle error) (err error) {
 			return ResponseAPIError(c, statusCode, errorMessage, errorString, nil)
 		}
 
-		return ResponseAPIError(c, restErr.StatusCode(), restErr.Message(), "", restErr.Causes())
+		return c.JSON(restErr.StatusCode(), restErr)
 
 	}
 

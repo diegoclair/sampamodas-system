@@ -6,6 +6,7 @@ import (
 
 	"github.com/diegoclair/go_utils-lib/v2/logger"
 	"github.com/diegoclair/sampamodas-system/backend/application/factory"
+	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/authroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/businessroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/companyroute"
 	"github.com/diegoclair/sampamodas-system/backend/application/rest/routes/leadroute"
@@ -51,6 +52,7 @@ func initServer() *echo.Echo {
 	srv.Use(middleware.CORSWithConfig(middleware.DefaultCORSConfig))
 
 	pingController := pingroute.NewController()
+	authController := authroute.NewController(factory.AuthService, factory.Mapper)
 	businessController := businessroute.NewController(factory.BusinessService, factory.Mapper)
 	companyController := companyroute.NewController(factory.CompanyService, factory.Mapper)
 	leadController := leadroute.NewController(factory.LeadService, factory.Mapper)
@@ -58,6 +60,7 @@ func initServer() *echo.Echo {
 	saleController := saleroute.NewController(factory.SaleService, factory.Mapper)
 
 	pingRoute := pingroute.NewRouter(pingController, "ping")
+	authRoute := authroute.NewRouter(authController, "auth")
 	businessRoute := businessroute.NewRouter(businessController, "businessess")
 	companyRoute := companyroute.NewRouter(companyController, "companies")
 	leadRoute := leadroute.NewRouter(leadController, "leads")
@@ -65,6 +68,7 @@ func initServer() *echo.Echo {
 	saleRoute := saleroute.NewRouter(saleController, "sales")
 
 	appRouter := &Router{}
+	appRouter.addRouters(authRoute)
 	appRouter.addRouters(pingRoute)
 	appRouter.addRouters(businessRoute)
 	appRouter.addRouters(companyRoute)

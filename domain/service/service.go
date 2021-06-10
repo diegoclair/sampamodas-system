@@ -6,13 +6,11 @@ import (
 	"github.com/diegoclair/sampamodas-system/backend/util/config"
 )
 
-// Service holds the domain service repositories
 type Service struct {
 	dm  contract.DataManager
 	cfg *config.EnvironmentVariables
 }
 
-// New returns a new domain Service instance
 func New(dm contract.DataManager, cfg *config.EnvironmentVariables) *Service {
 	svc := new(Service)
 	svc.dm = dm
@@ -21,20 +19,22 @@ func New(dm contract.DataManager, cfg *config.EnvironmentVariables) *Service {
 	return svc
 }
 
-//Manager defines the services aggregator interface
 type Manager interface {
-	LeadService(svc *Service) LeadService
-	CompanyService(svc *Service) CompanyService
+	AuthService(svc *Service) AuthService
 	BusinessService(svc *Service) BusinessService
+	CompanyService(svc *Service) CompanyService
+	LeadService(svc *Service) LeadService
 	ProductService(svc *Service) ProductService
 	SaleService(svc *Service, productService ProductService) SaleService
 }
 
-// PingService holds a ping service operations
 type PingService interface {
 }
 
-// BusinessService holds a business service operations
+type AuthService interface {
+	Signup(signup entity.User) (err error)
+}
+
 type BusinessService interface {
 	CreateBusiness(company entity.Business) error
 	GetBusinesses() (businesses []entity.Business, err error)
@@ -42,21 +42,18 @@ type BusinessService interface {
 	GetBusinessesByCompanyUUID(companyUUID string) (businesses []entity.Business, err error)
 }
 
-// CompanyService holds a company service operations
 type CompanyService interface {
 	CreateCompany(company entity.Company) error
 	GetCompanies() (companies []entity.Company, err error)
 	GetCompanyByUUID(companyUUID string) (company entity.Company, err error)
 }
 
-// LeadService holds a lead service operations
 type LeadService interface {
 	CreateLead(lead entity.Lead) (leadID int64, err error)
 	CreateLeadAddress(leadAddress entity.LeadAddress) error
 	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error)
 }
 
-// ProductService holds a product service operations
 type ProductService interface {
 	CreateProduct(product entity.Product) error
 	GetProducts() (products []entity.Product, err error)
@@ -64,7 +61,6 @@ type ProductService interface {
 	GetProductByProductStockID(productStockID int64) (product entity.Product, err error)
 }
 
-// SaleService holds a sale service operations
 type SaleService interface {
 	CreateSale(sale entity.Sale) (saleID int64, err error)
 	CreateSaleProduct(saleProduct entity.SaleProduct) error
@@ -78,6 +74,10 @@ type serviceManager struct {
 // NewServiceManager return a service manager instance
 func NewServiceManager() Manager {
 	return &serviceManager{}
+}
+
+func (s *serviceManager) AuthService(svc *Service) AuthService {
+	return newAuthService(svc)
 }
 
 func (s *serviceManager) BusinessService(svc *Service) BusinessService {
