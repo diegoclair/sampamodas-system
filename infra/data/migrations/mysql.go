@@ -358,6 +358,57 @@ var (
 		},
 		{
 			Version:     16,
+			Description: "Create tab_user",
+			Script: `
+				CREATE TABLE IF NOT EXISTS tab_user (
+					user_id INT NOT NULL AUTO_INCREMENT,
+					user_uuid CHAR(36) NOT NULL,
+					name VARCHAR(450) NOT NULL,
+					email VARCHAR(85) NULL,
+					password VARCHAR(200) NOT NULL,
+					company_id INT NULL,
+					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+					active TINYINT(1) NOT NULL DEFAULT 1,
+					PRIMARY KEY (user_id),
+					UNIQUE INDEX user_id_UNIQUE (user_id ASC) VISIBLE,
+					UNIQUE INDEX email_UNIQUE (email ASC) VISIBLE,
+					INDEX fk_tab_user_tab_company_idx (company_id ASC) VISIBLE,
+					CONSTRAINT fk_tab_user_tab_company
+					FOREIGN KEY (company_id)
+					REFERENCES tab_company (company_id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION)
+				ENGINE = InnoDB CHARACTER SET=utf8;
+			`,
+		},
+		{
+			Version:     17,
+			Description: "Create tab_user_business",
+			Script: `
+				CREATE TABLE IF NOT EXISTS tab_user_business (
+					user_id INT NOT NULL,
+					business_id INT NOT NULL,
+					created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+					update_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+					INDEX fk_tab_user_business_tab_user1_idx (user_id ASC) VISIBLE,
+					INDEX fk_tab_user_business_tab_business1_idx (business_id ASC) VISIBLE,
+					PRIMARY KEY (user_id, business_id),
+					CONSTRAINT fk_tab_user_business_tab_user1
+					FOREIGN KEY (user_id)
+					REFERENCES tab_user (user_id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION,
+					CONSTRAINT fk_tab_user_business_tab_business1
+					FOREIGN KEY (business_id)
+					REFERENCES tab_business (business_id)
+					ON DELETE NO ACTION
+					ON UPDATE NO ACTION)
+				ENGINE = InnoDB CHARACTER SET=utf8;
+			`,
+		},
+		{
+			Version:     18,
 			Description: "Insert data into tab_payment_method",
 			Script: `
 				INSERT INTO tab_payment_method 
@@ -369,7 +420,7 @@ var (
 			`,
 		},
 		{
-			Version:     17,
+			Version:     19,
 			Description: "Insert data into tab_send_method",
 			Script: `
 				INSERT INTO tab_send_method 

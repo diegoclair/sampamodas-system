@@ -12,6 +12,7 @@ type MySQLRepo interface {
 	Lead() LeadRepo
 	Product() ProductRepo
 	Sale() SaleRepo
+	User() UserRepo
 }
 
 // MysqlTransaction holds the methods that manipulates the main data, from within a transaction.
@@ -21,7 +22,6 @@ type MysqlTransaction interface {
 	Commit() error
 }
 
-// BusinessRepo defines the data set for business repo
 type BusinessRepo interface {
 	CreateBusiness(company entity.Business) error
 	GetBusinesses() (businesses []entity.Business, err error)
@@ -29,7 +29,6 @@ type BusinessRepo interface {
 	GetBusinessesByCompanyUUID(companyUUID string) (businesses []entity.Business, err error)
 }
 
-// CompanyRepo defines the data set for company repo
 type CompanyRepo interface {
 	CreateCompany(company entity.Company) error
 	GetCompanies() (companies []entity.Company, err error)
@@ -37,7 +36,6 @@ type CompanyRepo interface {
 	GetCompanyIDByUUID(companyUUID string) (companyID int64, err error)
 }
 
-// LeadRepo defines the data set for lead
 type LeadRepo interface {
 	GetLeadByPhoneNumber(phoneNumber string) (lead entity.Lead, err error)
 	GetLeadAddressByLeadID(leadID int64) (addresses []entity.LeadAddress, err error)
@@ -45,7 +43,6 @@ type LeadRepo interface {
 	CreateLeadAddress(leadAddress entity.LeadAddress) error
 }
 
-// ProductRepo defines the data set for product repo
 type ProductRepo interface {
 	CreateProduct(product entity.Product) (productID int64, err error)
 	GetProducts() (products []entity.Product, err error)
@@ -69,9 +66,12 @@ type ProductRepo interface {
 	GetGenderByName(genderName string) (genderID int64, err error)
 }
 
-// SaleRepo defines the data set for sale
 type SaleRepo interface {
 	CreateSale(sale entity.Sale) (saleID int64, err error)
 	CreateSaleProduct(saleProduct entity.SaleProduct) error
 	UpdateSaleTotalPrice(saleID int64, totalPrice float64) error
+}
+
+type UserRepo interface {
+	CreateUser(user entity.User) (err error)
 }

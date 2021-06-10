@@ -117,3 +117,7 @@ func (c *mysqlConn) Product() contract.ProductRepo {
 func (c *mysqlConn) Sale() contract.SaleRepo {
 	return newSaleRepo(c.db)
 }
+
+func (c *mysqlConn) User() contract.UserRepo {
+	return newUserRepo(c.db)
+}

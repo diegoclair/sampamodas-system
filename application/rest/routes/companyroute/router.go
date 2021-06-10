@@ -4,23 +4,26 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-// CompanyRouter holds the company handlers
+const (
+	rootRoute     = "/"
+	companyByUUID = "/:uuid/"
+)
+
 type CompanyRouter struct {
-	ctrl   *Controller
-	router *echo.Echo
+	ctrl      *Controller
+	routeName string
 }
 
-// NewRouter returns a new CompanyRouter instance
-func NewRouter(ctrl *Controller, router *echo.Echo) *CompanyRouter {
+func NewRouter(ctrl *Controller, routeName string) *CompanyRouter {
 	return &CompanyRouter{
-		ctrl:   ctrl,
-		router: router,
+		ctrl:      ctrl,
+		routeName: routeName,
 	}
 }
 
-//RegisterRoutes is a routers map of company requests
-func (r *CompanyRouter) RegisterRoutes() {
-	r.router.POST("/company/", r.ctrl.handleCreateCompany)
-	r.router.GET("/companies/", r.ctrl.handleGetCompanies)
-	r.router.GET("/company/:uuid/", r.ctrl.handleGetCompanyByUUID)
+func (r *CompanyRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
+	router := privateGroup.Group(r.routeName)
+	router.POST(rootRoute, r.ctrl.handleCreateCompany)
+	router.GET(rootRoute, r.ctrl.handleGetCompanies)
+	router.GET(companyByUUID, r.ctrl.handleGetCompanyByUUID)
 }

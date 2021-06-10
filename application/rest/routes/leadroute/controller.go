@@ -17,13 +17,11 @@ var (
 	once     sync.Once
 )
 
-//Controller holds lead handler functions
 type Controller struct {
 	leadService service.LeadService
 	mapper      mapper.Mapper
 }
 
-//NewController to handle requests
 func NewController(leadService service.LeadService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{

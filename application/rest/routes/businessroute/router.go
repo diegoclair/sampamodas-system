@@ -1,27 +1,29 @@
 package businessroute
 
-import (
-	"github.com/labstack/echo/v4"
+import "github.com/labstack/echo/v4"
+
+const (
+	rootRoute             = "/"
+	businessByUUID        = "/:uuid/"
+	businessByCompanyUUID = "/:company_uuid/"
 )
 
-// BusinessRouter holds the business handlers
 type BusinessRouter struct {
-	ctrl   *Controller
-	router *echo.Echo
+	ctrl      *Controller
+	routeName string
 }
 
-// NewRouter returns a new BusinessRouter instance
-func NewRouter(ctrl *Controller, router *echo.Echo) *BusinessRouter {
+func NewRouter(ctrl *Controller, routeName string) *BusinessRouter {
 	return &BusinessRouter{
-		ctrl:   ctrl,
-		router: router,
+		ctrl:      ctrl,
+		routeName: routeName,
 	}
 }
 
-//RegisterRoutes is a routers map of business requests
-func (r *BusinessRouter) RegisterRoutes() {
-	r.router.POST("/business/", r.ctrl.handleCreateBusiness)
-	r.router.GET("/businesses/", r.ctrl.handleGetBusinesses)
-	r.router.GET("/business/:uuid/", r.ctrl.handleGetBusinessByID)
-	r.router.GET("/businesses/:company_uuid/", r.ctrl.handleGetBusinessByCompanyID)
+func (r *BusinessRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
+	router := privateGroup.Group(r.routeName)
+	router.POST(rootRoute, r.ctrl.handleCreateBusiness)
+	router.GET(rootRoute, r.ctrl.handleGetBusinesses)
+	router.GET(businessByUUID, r.ctrl.handleGetBusinessByID)
+	router.GET(businessByCompanyUUID, r.ctrl.handleGetBusinessByCompanyID)
 }

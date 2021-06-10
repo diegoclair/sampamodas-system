@@ -19,6 +19,7 @@ type Services struct {
 	LeadService     service.LeadService
 	ProductService  service.ProductService
 	SaleService     service.SaleService
+	AuthService     service.AuthService
 }
 
 var (
@@ -43,6 +44,7 @@ func GetDomainServices() *Services {
 		instance = &Services{}
 		instance.Cfg = cfg
 		instance.Mapper = mapper
+		instance.AuthService = svm.AuthService(svc)
 		instance.BusinessService = svm.BusinessService(svc)
 		instance.CompanyService = svm.CompanyService(svc)
 		instance.LeadService = svm.LeadService(svc)

@@ -60,27 +60,26 @@ func (t *mysqlTransaction) Rollback() error {
 	return nil
 }
 
-//Business returns the business transaction set
 func (t *mysqlTransaction) Business() contract.BusinessRepo {
 	return newBusinessRepo(t.tx)
 }
 
-//Company returns the company transaction set
 func (t *mysqlTransaction) Company() contract.CompanyRepo {
 	return newCompanyRepo(t.tx)
 }
 
-//Lead returns the lead transaction set
 func (t *mysqlTransaction) Lead() contract.LeadRepo {
 	return newLeadRepo(t.tx)
 }
 
-//Product returns the product transaction set
 func (t *mysqlTransaction) Product() contract.ProductRepo {
 	return newProductRepo(t.tx)
 }
 
-//Sale returns the sale transaction set
 func (t *mysqlTransaction) Sale() contract.SaleRepo {
 	return newSaleRepo(t.tx)
+}
+
+func (t *mysqlTransaction) User() contract.UserRepo {
+	return newUserRepo(t.tx)
 }
