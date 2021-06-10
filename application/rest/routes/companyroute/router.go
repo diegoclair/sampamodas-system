@@ -21,7 +21,6 @@ func NewRouter(ctrl *Controller, routeName string) *CompanyRouter {
 	}
 }
 
-//RegisterRoutes is a routers map of company requests
 func (r *CompanyRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
 	router := privateGroup.Group(r.routeName)
 	router.POST(rootRoute, r.ctrl.handleCreateCompany)

@@ -13,7 +13,6 @@ type SaleRouter struct {
 	routeName string
 }
 
-// NewRouter returns a new SaleRouter instance
 func NewRouter(ctrl *Controller, routeName string) *SaleRouter {
 	return &SaleRouter{
 		ctrl:      ctrl,
@@ -21,7 +20,6 @@ func NewRouter(ctrl *Controller, routeName string) *SaleRouter {
 	}
 }
 
-//RegisterRoutes is a routers map of sale requests
 func (r *SaleRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
 	router := privateGroup.Group(r.routeName)
 	router.POST(rootRoute, r.ctrl.handleCreateSale)

@@ -13,7 +13,6 @@ type PingRouter struct {
 	routeName string
 }
 
-// NewRouter returns a new PingRouter instance
 func NewRouter(ctrl *Controller, routeName string) *PingRouter {
 	return &PingRouter{
 		ctrl:      ctrl,
@@ -21,7 +20,6 @@ func NewRouter(ctrl *Controller, routeName string) *PingRouter {
 	}
 }
 
-//RegisterRoutes is a routers map of ping requests
 func (r *PingRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
 	router := appGroup.Group(r.routeName)
 	router.GET(rootRoute, r.ctrl.handlePing)

@@ -15,7 +15,6 @@ type LeadRouter struct {
 	routeName string
 }
 
-// NewRouter returns a new LeadRouter instance
 func NewRouter(ctrl *Controller, routeName string) *LeadRouter {
 	return &LeadRouter{
 		ctrl:      ctrl,
@@ -23,7 +22,6 @@ func NewRouter(ctrl *Controller, routeName string) *LeadRouter {
 	}
 }
 
-//RegisterRoutes is a routers map of lead requests
 func (r *LeadRouter) RegisterRoutes(appGroup, privateGroup *echo.Group) {
 	router := privateGroup.Group(r.routeName)
 	router.POST(rootRoute, r.ctrl.handleCreateLead)

@@ -17,13 +17,11 @@ var (
 	once     sync.Once
 )
 
-//Controller holds sales handler functions
 type Controller struct {
 	saleService service.SaleService
 	mapper      mapper.Mapper
 }
 
-//NewController to handle requests
 func NewController(saleService service.SaleService, mapper mapper.Mapper) *Controller {
 	once.Do(func() {
 		instance = &Controller{
