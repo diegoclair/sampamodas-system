@@ -8,7 +8,6 @@ require (
 	github.com/IQ-tech/go-mapper v1.0.5
 	github.com/cznic/ql v1.2.0 // indirect
 	github.com/diegoclair/go_utils-lib/v2 v2.4.1
-	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/snappy v0.0.1 // indirect
 	github.com/labstack/echo/v4 v4.1.17
