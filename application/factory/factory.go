@@ -10,7 +10,6 @@ import (
 	"github.com/diegoclair/sampamodas-system/backend/util/config"
 )
 
-//Services is the factory to all serrvices
 type Services struct {
 	Cfg             *config.EnvironmentVariables
 	Mapper          mapper.Mapper
