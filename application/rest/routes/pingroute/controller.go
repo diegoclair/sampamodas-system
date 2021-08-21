@@ -3,7 +3,6 @@ package pingroute
 import (
 	"sync"
 
-	"github.com/gin-gonic/gin"
 	"github.com/labstack/echo/v4"
 )
 
@@ -23,7 +22,10 @@ func NewController() *Controller {
 }
 
 func (s *Controller) handlePing(c echo.Context) error {
-	return c.JSON(200, gin.H{
-		"message": "pong",
-	})
+	response := struct {
+		message string
+	}{
+		message: "pong",
+	}
+	return c.JSON(200, response)
 }
