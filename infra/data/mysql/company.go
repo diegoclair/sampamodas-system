@@ -72,8 +72,8 @@ func (s *companyRepo) GetCompanies() (companies []entity.Company, err error) {
 		return companies, mysqlutils.HandleMySQLError(err)
 	}
 
-	var company entity.Company
 	for rows.Next() {
+		company := entity.Company{}
 		err = rows.Scan(
 			&company.ID,
 			&company.UUID,

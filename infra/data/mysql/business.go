@@ -69,8 +69,8 @@ func (s *businessRepo) GetBusinesses() (businesses []entity.Business, err error)
 		return businesses, mysqlutils.HandleMySQLError(err)
 	}
 
-	var business entity.Business
 	for rows.Next() {
+		business := entity.Business{}
 		err = rows.Scan(
 			&business.ID,
 			&business.UUID,
@@ -151,8 +151,8 @@ func (s *businessRepo) GetBusinessesByCompanyUUID(companyUUID string) (businesse
 		return businesses, mysqlutils.HandleMySQLError(err)
 	}
 
-	var business entity.Business
 	for rows.Next() {
+		business := entity.Business{}
 		err = rows.Scan(
 			&business.ID,
 			&business.UUID,

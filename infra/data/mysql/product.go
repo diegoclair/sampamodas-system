@@ -93,8 +93,8 @@ func (s *productRepo) GetProducts() (products []entity.Product, err error) {
 		return products, mysqlutils.HandleMySQLError(err)
 	}
 
-	var product entity.Product
 	for rows.Next() {
+		product := entity.Product{}
 		err = rows.Scan(
 			&product.ID,
 			&product.Name,
@@ -286,8 +286,8 @@ func (s *productRepo) GetStockProductByProductID(productID int64) (productsStock
 		return productsStock, mysqlutils.HandleMySQLError(err)
 	}
 
-	var productStock entity.ProductStock
 	for rows.Next() {
+		productStock := entity.ProductStock{}
 		err = rows.Scan(
 			&productStock.ID,
 			&productStock.Color.ID,

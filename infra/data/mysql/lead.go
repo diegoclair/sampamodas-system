@@ -89,8 +89,8 @@ func (s *leadRepo) GetLeadAddressByLeadID(leadID int64) (addresses []entity.Lead
 		return addresses, mysqlutils.HandleMySQLError(err)
 	}
 
-	var address entity.LeadAddress
 	for rows.Next() {
+		address := entity.LeadAddress{}
 		err = rows.Scan(
 			&address.ID,
 			&address.LeadID,
